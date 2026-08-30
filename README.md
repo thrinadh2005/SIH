@@ -33,7 +33,7 @@
 2. [Problem Statement & Maritime Context](#2-problem-statement--maritime-context)
 3. [Proposed Solution & Core Innovations](#3-proposed-solution--core-innovations)
 4. [System Architecture & Data Flow](#4-system-architecture--data-flow)
-5. [End-to-End User Workflow](#5-end-to-end-user-workflow)
+5. [End-to-End User Workflow & Journey](#5-end-to-end-user-workflow--journey)
 6. [Real-Time Operational Tech Flow](#6-real-time-operational-tech-flow)
 7. [Physics-Informed ML Training Pipeline](#7-physics-informed-ml-training-pipeline)
 8. [Mathematical & Physical Modeling](#8-mathematical--physical-modeling)
@@ -91,10 +91,32 @@ Commercial shipping transports **over 90% of global trade**, burning hundreds of
 
 <div align="center">
   <img src="docs/images/problem_solution_impact.png" alt="The Problem vs Our Solution vs The Impact" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
-  <p><em>Figure 1: High-Level Overview — The Problem, Our Quantum Solution & The Verified Operational Impact</em></p>
+  <p><em>Figure 1: High-Level Problem, Quantum Solution & Verified Operational Impact Breakdown</em></p>
 </div>
 
 <br/>
+
+### 2.3 Detailed Breakdown of Figure 1 (Problem vs Solution vs Impact)
+
+#### 🔴 The Problem Column: Root Causes of Maritime Inefficiency
+* **High Fuel Consumption:** Traditional Capesize and large container vessels consume between 40 to 120 metric tonnes of bunker fuel daily, creating massive operational expenditure and high carbon footprints.
+* **Excessive GHG Emissions:** Heavy fuel oil combustion releases severe quantities of carbon dioxide ($CO_2$), sulfur oxides ($SO_x$), nitrogen oxides ($NO_x$), and particulate matter into ocean corridors.
+* **Fixed Speed Schedules:** Traditional ship operators lock vessels into static cruise velocities (e.g., flat 18.2 knots), failing to leverage calm sea sectors or decelerate ahead of severe storms.
+* **Changing Ocean Conditions:** Head currents and severe storm swells increase hull drag exponentially ($P \propto v^3$), requiring dynamic speed throttle management.
+* **Complex Regulations & Carbon Taxes:** The IMO Carbon Intensity Indicator (CII) and EU Emissions Trading System (EU ETS) penalize inefficient vessels with financial levies and operational bans.
+* **Inefficient Classical Solvers:** Classical routing metaheuristics (standard GA and PSO) easily get trapped in local cost minima during non-linear storm surges.
+
+#### 🟢 Our Solution Column: The GreenFleet Quantum Engine
+* **Live Ocean Intelligence:** Continuous automated ingestion of significant wave height ($H_s$), wave period ($T_p$), wind velocity, and Copernicus CMEMS ocean current velocity vectors ($u_o, v_o$).
+* **Physics-Informed ML Surrogate Suite:** Ultra-fast surrogate regressor ($R^2=0.9989$) trained on 50,000 real-world AIS records to calculate instant hydrodynamic hull resistance and engine fuel burn in $<0.42\text{ ms}$.
+* **3-Tier Hybrid Quantum-Inspired Optimization (HQOA):** Combines Quantum Genetic Algorithms (Q-bit superposition) and Quantum Particle Swarm Optimization (delta-potential well tunneling) to discover the global optimal speed schedule.
+* **Adaptive Smart Speed Optimization:** Dynamically distributes speed across voyage waypoints to maximize hydro-efficiency while guaranteeing strict port arrival deadlines.
+
+#### 🔵 The Impact Column: Quantifiable Maritime Transformation
+* **Fuel Reduction:** Reduces bunker fuel burn by **16.1% average** (saving 89.8 metric tonnes of fuel per typical Singapore–Rotterdam voyage).
+* **Direct Cost Savings:** Saves **$55,676 USD per voyage** in fuel expenses and eliminates over **$59,800 USD** in EU ETS carbon tax penalties.
+* **Regulatory Excellence:** Successfully transitions vessel operations from **IMO Grade E (detention threshold)** to **IMO Grade A (superior compliance)**.
+* **Guaranteed On-Time Arrival:** Meets designated port terminal berthing windows within $\pm 15\text{ minutes}$, eliminating costly harbor demurrage penalties.
 
 ---
 
@@ -121,17 +143,63 @@ GreenFleet Quantum integrates **Quantum-Inspired Metaheuristics (HQOA)**, **Phys
 
 <div align="center">
   <img src="docs/images/system_architecture_diagram.png" alt="System Architecture Diagram" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 120, 255, 0.18);" />
-  <p><em>Figure 2: Complete End-to-End System Architecture — Ingestion, ML Surrogate, HQOA Solver, Microservices & Deployment</em></p>
+  <p><em>Figure 2: Complete Tiered System Architecture — Data Ingestion, ML Surrogates, Quantum Engine, Backend & Deployment</em></p>
 </div>
+
+<br/>
+
+### 4.1 Detailed Architectural Layer Walkthrough (Figure 2)
+
+#### 1. Data Ingestion & Live Ocean Sensing Layer
+* **OpenMeteo Marine LIVE API:** Ingests real-time significant wave height ($H_s$), peak wave period ($T_p$), wind velocity ($V_{\text{wind}}$), and wind angle ($\theta_{\text{wind}}$).
+* **Copernicus Marine Environment Monitoring Service (CMEMS):** Supplies high-resolution $1/12^\circ$ ocean current velocity vectors ($u_o, v_o$) to calculate true vessel speed through water.
+* **AIS Telemetry Archive (USCG NAVCEN):** Ingests 50,000 real-world kinematic records across international container, bulk carrier, and tanker voyages.
+* **IMO 4th GHG & DNV LCA Database:** Provides standardized Well-to-Wake (WtW) and Tank-to-Wake (TtW) carbon emission factors and carbon tariff rates.
+
+#### 2. Physics-Informed ML Surrogate Layer
+* **Physics-Informed XGBoost Regressor:** Primary production surrogate regressor achieving $R^2 = 0.9989$, $\text{MAPE} = 1.32\%$, and sub-millisecond ($<0.42\text{ ms}$) execution speed.
+* **Ensemble Baseline Suite:** Includes Random Forest Regressor ($R^2=0.9989$), Gradient Boosting Regressor ($R^2=0.9988$), and Multi-Layer Perceptron ($R^2=0.9892$).
+* **Physics Constraints:** Imposes Admiralty cubic power scaling ($P \propto \Delta^{2/3}v^3$), Townsin-Kwon wave resistance coefficients, and parabolic SFOC engine load curves.
+
+#### 3. Hybrid Quantum Optimization Engine (HQOA)
+* **Quantum Genetic Algorithm (QGA):** Manages combinatorial corridor waypoint selection using Q-bit rotation gates.
+* **Quantum Particle Swarm Optimization (QPSO):** Performs continuous speed trajectory optimization with delta-potential barrier tunneling.
+* **Pareto Multi-Objective Refinement:** Discovers non-dominated solutions across Fuel Burn, Carbon Tax, and Port Demurrage.
+* **Gate-Level Quantum Circuits (QAOA / VQE):** Parameterized quantum ansatz executed via Qiskit with IBM Quantum cloud integration.
+
+#### 4. Backend Microservice & Persistence Layer
+* **FastAPI Async Engine:** High-concurrency asynchronous REST microservice running with 4 Uvicorn ASGI workers.
+* **SQLite Database (`data/greenfleet.db`):** Embedded ACID-compliant database storing vessels, voyages, telemetry, and audit logs.
+* **Security Hardening Middleware:** Enforces OWASP headers (HSTS, CSP, X-Frame-Options, X-Content-Type-Options) and CORS validation.
+* **Real-Time WebSockets:** Broadcasts 3-second live kinematic feeds (`/ws/ais/live`) and quantum state collapse streams (`/ws/quantum/stream`).
+
+#### 5. Frontend & Deployment Layer
+* **React 19 & Tailwind CSS v4:** Modern, dark-mode glassmorphic client interface optimized for bridge navigation displays.
+* **Leaflet GIS Engine:** Interactive global maritime navigation map displaying real-time vessel vectors and weather isobar lines.
+* **SHA-256 IMO Certificate Generator:** Generates verifiable, digitally signed Grade-A audit certificates with PDF/HTML export.
+* **Production Deployment:** Fully containerized with Docker, Docker Compose, and Nginx reverse proxy.
 
 ---
 
-## 5. End-to-End User Workflow
+## 5. End-to-End User Workflow & Journey
 
 <div align="center">
   <img src="docs/images/end_to_end_user_workflow.png" alt="End-to-End User Workflow" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 150, 255, 0.18);" />
-  <p><em>Figure 3: End-to-End User Journey — From Fleet Selection to Live Ocean Intelligence, Quantum Optimization & Verified IMO Audit</em></p>
+  <p><em>Figure 3: 9-Stage End-to-End Operational Journey — Fleet Selection to Cryptographic Audit Certification</em></p>
 </div>
+
+<br/>
+
+### 5.1 Step-by-Step Operational Workflow (Figure 3)
+1. **Fleet & Voyage Selection:** Fleet managers choose the vessel class (e.g., Container 15,000 TEU, Capesize Bulk Carrier), deadweight tonnage (DWT), cargo payload, and departure/destination ports.
+2. **Live Ocean Ingestion:** The system queries OpenMeteo and Copernicus CMEMS APIs to fetch real-time sea states, swell heights, and current vectors along all candidate route waypoints.
+3. **Hydrodynamic Fuel Prediction:** The Physics-Informed ML surrogate evaluates baseline calm water resistance, added wave resistance, wind drag, and engine SFOC in $<0.42\text{ ms}$.
+4. **HQOA Quantum Optimization Execution:** The 3-Tier HQOA solver initializes Q-bit superposition states and executes quantum particle swarms to explore the multi-waypoint speed search space.
+5. **Pareto Frontier Exploration:** The optimizer constructs a Pareto frontier tradeoff curve balancing Fuel-Min, Carbon-Min, and Cost-Min operational points.
+6. **Operator Decision & Route Approval:** The ship master reviews the recommended dynamic speed trajectory, ETA margin, and projected fuel savings before locking the profile.
+7. **Voyage Execution & Telemetry Streaming:** The vessel navigates the corridor while streaming 3-second live kinematic coordinates, heading, and engine load to the fleet command center via WebSockets.
+8. **Dynamic Storm Re-Optimization:** If live metocean sensors detect sudden storm surges ($H_s > 3.5\text{m}$), the HQOA engine automatically triggers a sub-150ms re-optimization.
+9. **IMO Audit Certification:** Upon voyage completion, the system generates a cryptographically signed SHA-256 IMO Grade-A compliance certificate for regulatory filing.
 
 ---
 
@@ -139,8 +207,18 @@ GreenFleet Quantum integrates **Quantum-Inspired Metaheuristics (HQOA)**, **Phys
 
 <div align="center">
   <img src="docs/images/realtime_tech_flow.png" alt="Real-Time Operational Tech Flow" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 200, 150, 0.18);" />
-  <p><em>Figure 4: Real-Time Operational Tech Flow — 3-Second AIS Telemetry Broadcast, Physics Ingestion & Sub-150ms Dynamic Re-Optimization</em></p>
+  <p><em>Figure 4: Closed-Loop Real-Time Technical Architecture & Dynamic Re-Optimization Feedback Loop</em></p>
 </div>
+
+<br/>
+
+### 6.1 Technical Flow Mechanics (Figure 4)
+* **High-Frequency Ingestion Loop:** Ingests live AIS vessel telemetry every 3 seconds, pairing vessel speed and heading with localized metocean wave and current vectors.
+* **Physics-Informed Feature Engineering:** Normalizes vessel displacement, draft ratio, and relative weather attack angles ($\theta_{\text{rel}} = |\theta_{\text{ship}} - \theta_{\text{wave}}|$) into standardized feature tensors.
+* **Surrogate Ingestion & Resistance Estimation:** XGBoost surrogate evaluates total propulsion power and fuel burn rate in real time without heavy CFD computational overhead.
+* **Storm Event Triggering:** If significant wave height exceeds safety or efficiency thresholds ($H_s \ge 3.5\text{m}$), an asynchronous re-optimization event is dispatched.
+* **Sub-150ms Swarm Recalibration:** Vectorized QPSO particles tunnel through the localized cost barrier, finding speed adjustments (e.g., slowing during peak storm and accelerating in trailing favorable currents).
+* **WebSocket Dispatch:** Updated throttle commands are immediately pushed to the React 19 bridge interface via `/ws/ais/live`.
 
 ---
 
@@ -148,8 +226,22 @@ GreenFleet Quantum integrates **Quantum-Inspired Metaheuristics (HQOA)**, **Phys
 
 <div align="center">
   <img src="docs/images/physics_informed_ml_pipeline.png" alt="Physics-Informed ML Training Pipeline" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(70, 130, 180, 0.18);" />
-  <p><em>Figure 5: Multi-Model Machine Learning Training Pipeline — Feature Extraction, Physics Constraints, Benchmarking & Deployment</em></p>
+  <p><em>Figure 5: 6-Stage Machine Learning Training & Validation Pipeline for Hydrodynamic Surrogates</em></p>
 </div>
+
+<br/>
+
+### 7.1 Pipeline Stage Details (Figure 5)
+1. **Data Collection:** Assembled 50,000 verified maritime telemetry records combining USCG AIS data, Copernicus ocean currents, and OpenMeteo sea-state observations across global corridors.
+2. **Data Preprocessing & Cleaning:** Filtered sensor dropouts, normalized vessel displacement and draft ratios, and removed kinematic anomalies using Interquartile Range (IQR) filtering.
+3. **Physics Feature Extraction:** Constructed domain-specific physical feature columns:
+   - Admiralty Calm Water Resistance: $P_{\text{calm}} \propto \Delta^{2/3} v^3$
+   - Townsin-Kwon Wave Resistance Factor: $\Delta P_{\text{wave}} \propto \Delta^{2/3} H_s^2 v_{\text{apparent}} f(\theta_{\text{wave}})$
+   - Isherwood Aerodynamic Wind Drag: $\Delta P_{\text{wind}} \propto V_{\text{rel\_wind}}^2 v_{\text{ship}}$
+   - Parabolic SFOC Engine Load Scaling: $\text{SFOC}(L) = \text{SFOC}_{\text{base}}(1 + 1.2(L-0.75)^2)$
+4. **Multi-Model Surrogate Training:** Trained 4 regression architectures (Physics-Informed XGBoost, Random Forest Ensemble, Gradient Boosting Regressor, Neural MLP).
+5. **Benchmark & Validation:** Evaluated models on a 20% holdout test set ($N = 10,000$ samples). **XGBoost achieved $R^2 = 0.9989$, $\text{MAPE} = 1.32\%$, $\text{RMSE} = 2.25\text{ MT/day}$**.
+6. **Production Model Serialization:** Serialized the primary model into `models/hydrodynamic_fuel_model.joblib` for instantaneous microservice inference.
 
 ---
 
@@ -205,19 +297,48 @@ Where $a, c$ are IMO vessel-specific reference parameters and $Z$ is the annual 
 <img src="docs/images/command_center_preview.jpg" alt="Real-Time Maritime Command Center" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 150, 255, 0.2);" />
 <p><em>Figure 6: Live Interactive Fleet Command Center with Real-Time AIS Vessel Telemetry, Dynamic Speed Profiles, Global Shipping Corridors, and IMO CII Rating Badges</em></p>
 
+</div>
+
+#### Detailed Breakdown of Figure 6 (Command Center UI)
+* **Fleet Status Ring Meter:** Displays 12 active vessels in the fleet (11 on-schedule, 1 delayed due to adverse weather).
+* **Active Voyage Telemetry:** Real-time tracking of *M/V Sea Guardian* (Shanghai $\to$ Rotterdam, 18.2 kts speed, GPS: $34^\circ 51' \text{N} / 138^\circ 22' \text{E}$, Heading: $265^\circ \text{W}$).
+* **Speed Throttle Profile Graph:** Interactive visualization comparing historical flat baseline speed against the dynamic quantum-optimized waypoint trajectory.
+* **Quantum Engine Load Meter:** Live dial showing optimal 78% engine load factor for minimum SFOC fuel consumption.
+* **IMO Decarbonization Rating Panel:** Live operational CII ratings (M/V Polaris: Grade A, M/V Sea Guardian: Grade B, M/V Atlas: Grade C).
+
 <br/>
+
+<div align="center">
 
 ### ⚛️ 5-Way Quantum Optimization Tournament & Pareto Frontier Visualizer
 <img src="docs/images/quantum_benchmark_preview.jpg" alt="Quantum Benchmark Tournament Arena" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(138, 43, 226, 0.2);" />
 <p><em>Figure 7: Head-to-Head Optimizer Arena displaying Convergence Rates, Pareto Multi-Objective Frontier Tradeoffs, Delta-Potential Energy Wells, and Fuel Savings Breakdown</em></p>
 
+</div>
+
+#### Detailed Breakdown of Figure 7 (Benchmark Arena UI)
+* **Convergence Time Chart:** Shows solver iteration speed (Hybrid HQOA converges in $142\text{ ms}$ vs $5,240\text{ ms}$ for Classical GA).
+* **Pareto Multi-Objective Frontier:** Non-dominated tradeoff curve between Total Voyage Energy Consumption vs Arrival Duration.
+* **Quantum Tunneling Delta-Potential Energy Well ($\Delta E$):** Demonstrates wave-function particle tunneling across storm drag energy barriers without getting trapped in local cost minima.
+* **Fuel Reduction Percentage Bars:** Compares realized savings (HQOA: 74.3% efficiency score vs QPSO: 68.1% vs QGA: 61.5% vs Classical PSO: 52.8%).
+* **Algorithm Ranking Table:** Comprehensive performance ranking displaying execution speed, fuel reduction, velocity delta, and overall efficiency.
+
 <br/>
+
+<div align="center">
 
 ### 📜 Tamper-Proof Cryptographic IMO Certificate & Fuel Sandbox
 <img src="docs/images/decarbonization_certificate_preview.jpg" alt="IMO Decarbonization & Compliance Certificate" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 255, 170, 0.2);" />
 <p><em>Figure 8: SHA-256 Digitally Signed IMO Grade-A Compliance Certificate and Multi-Fuel Well-to-Wake Life Cycle Assessment (LCA) Sandbox</em></p>
 
 </div>
+
+#### Detailed Breakdown of Figure 8 (IMO Certificate & Fuel Sandbox UI)
+* **Official IMO Grade-A Compliance Certificate:** Formal digital audit document certifying voyage decarbonization under IMO Marine Environment Protection Committee guidelines.
+* **SHA-256 Cryptographic Digital Seal:** Immutable verification hash generated over voyage telemetry (`voyage_id|vessel_name|dwt|fuel_type|attained_cii|cii_grade|timestamp`).
+* **Verification QR Code:** Scannable digital authentication code linking to official registry verification URL.
+* **Well-to-Wake Emissions Audit:** Clear graphical breakdown of Well-to-Tank (production & bunkering) vs Tank-to-Wake (combustion) emissions.
+* **Alternative Fuel LCA Sandbox:** Side-by-side comparison of Green Methanol, Ammonia, LNG, and Hydrogen with lifecycle cost and carbon tax savings projections.
 
 ---
 
@@ -252,7 +373,7 @@ d:\PROJECTS\SIH\
 │   └── images/                                # High-resolution UI previews & architecture figures
 │       ├── command_center_preview.jpg         # Real-time AIS Command Center UI preview
 │       ├── decarbonization_certificate_preview.jpg # Cryptographic IMO Certificate & Sandbox UI
-│       ├── end_to_end_user_workflow.png       # Complete 8-step user journey infographic
+│       ├── end_to_end_user_workflow.png       # Complete 9-step user journey infographic
 │       ├── greenfleet_hero_banner.jpg         # Master platform hero visual banner
 │       ├── physics_informed_ml_pipeline.png   # ML surrogate training pipeline infographic
 │       ├── problem_solution_impact.png        # Problem, Solution & Impact overview
