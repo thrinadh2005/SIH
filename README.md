@@ -237,7 +237,7 @@ GreenFleet Quantum integrates **Quantum-Inspired Metaheuristics (HQOA)**, **Phys
 3. **Physics Feature Extraction:** Constructed domain-specific physical feature columns:
    - Admiralty Calm Water Resistance: $P_{\text{calm}} \propto \Delta^{2/3} v^3$
    - Townsin-Kwon Wave Resistance Factor: $\Delta P_{\text{wave}} \propto \Delta^{2/3} H_s^2 v_{\text{apparent}} f(\theta_{\text{wave}})$
-   - Isherwood Aerodynamic Wind Drag: $\Delta P_{\text{wind}} \propto V_{\text{rel\_wind}}^2 v_{\text{ship}}$
+   - Isherwood Aerodynamic Wind Drag: $\Delta P_{\text{wind}} \propto V_{\text{wind,rel}}^2 \cdot v_{\text{ship}}$
    - Parabolic SFOC Engine Load Scaling: $\text{SFOC}(L) = \text{SFOC}_{\text{base}}(1 + 1.2(L-0.75)^2)$
 4. **Multi-Model Surrogate Training:** Trained 4 regression architectures (Physics-Informed XGBoost, Random Forest Ensemble, Gradient Boosting Regressor, Neural MLP).
 5. **Benchmark & Validation:** Evaluated models on a 20% holdout test set ($N = 10,000$ samples). **XGBoost achieved $R^2 = 0.9989$, $\text{MAPE} = 1.32\%$, $\text{RMSE} = 2.25\text{ MT/day}$**.
@@ -261,7 +261,7 @@ $$\Delta P_{\text{wave}} = c_{\text{wave}} \cdot \Delta^{2/3} \cdot H_s^2 \cdot 
 $$f(\theta_{\text{wave}}) = \begin{cases} 1.00 & \text{Head Sea } (|\theta| \le 45^\circ) \\ 0.60 & \text{Beam Sea } (45^\circ < |\theta| \le 135^\circ) \\ 0.25 & \text{Following Sea } (|\theta| > 135^\circ) \end{cases}$$
 
 #### 3. Aerodynamic Wind Drag (Isherwood Formulation):
-$$\Delta P_{\text{wind}} = 0.5 \cdot \rho_{\text{air}} \cdot C_{\text{wind}} \cdot A_{\text{transverse}} \cdot V_{\text{rel\_wind}}^2 \cdot v_{\text{ship}}$$
+$$\Delta P_{\text{wind}} = 0.5 \cdot \rho_{\text{air}} \cdot C_{\text{wind}} \cdot A_{\text{transverse}} \cdot V_{\text{wind,rel}}^2 \cdot v_{\text{ship}}$$
 
 #### 4. Engine Specific Fuel Oil Consumption (SFOC) Parabolic Curve:
 $$\text{SFOC}(L) = \text{SFOC}_{\text{base}} \cdot \left(1.0 + 1.2 \cdot (L - 0.75)^2\right)$$
