@@ -62,13 +62,20 @@ export default function FuelSandbox({ onNavigate }: Props) {
               Well-to-wake lifecycle analysis · Market pricing · Cold-ironing at berth
             </p>
           </div>
-          <button
-            onClick={() => onNavigate("compliance")}
-            className="px-4 py-2 rounded-lg text-sm font-semibold border transition-all hover:bg-emerald-500/10"
-            style={{ borderColor: "var(--border)", color: "var(--text-2)", background: "transparent" }}
-          >
-            IMO CII Impact →
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onNavigate("commercial")}
+              className="px-3.5 py-2 rounded-lg text-xs font-semibold border transition-all hover:bg-sky-500/10 text-sky-400 border-sky-500/30"
+            >
+              Bunker Arbitrage & Retrofit ROI →
+            </button>
+            <button
+              onClick={() => onNavigate("compliance")}
+              className="px-3.5 py-2 rounded-lg text-xs font-semibold border transition-all hover:bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+            >
+              IMO CII Impact →
+            </button>
+          </div>
         </div>
 
         {/* Fuel selector */}

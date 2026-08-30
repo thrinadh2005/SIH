@@ -126,6 +126,16 @@ export default function CommandCenter({ onNavigate }: Props) {
             }
           >
             <MaritimeMap
+              initialVessels={fleet.map((v) => ({
+                id: v.id,
+                name: v.name,
+                lat: v.lat || 12.6,
+                lng: v.lng || 43.4,
+                speed: v.speed || 15.0,
+                heading: v.heading || 280,
+                status: v.status || "optimized",
+                type: v.type || "Commercial",
+              }))}
               vessels={fleet.map((v) => ({
                 id: v.id,
                 name: v.name,

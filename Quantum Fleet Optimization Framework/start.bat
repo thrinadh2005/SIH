@@ -2,67 +2,59 @@
 setlocal enabledelayedexpansion
 title GreenFleet Quantum (SIH-26138)
 
-:: Navigate to current directory
 cd /d "%~dp0"
-
 cls
+
 echo =======================================================================
-echo     GREENFLEET QUANTUM: MARITIME DECARBONIZATION PLATFORM
-echo                   Smart India Hackathon 2026 (SIH-26138)
+echo       GREENFLEET QUANTUM: Maritime Decarbonization Platform
+echo                 Smart India Hackathon 2026 (SIH-26138)
 echo =======================================================================
 echo.
 
-:: 1. Check Python & Node
 where python >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Python is not found in PATH!
-    pause
-    exit /b 1
+    echo [ERROR] Python not found in PATH! Install from python.org
+    pause & exit /b 1
 )
 
 where node >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Node.js is not found in PATH!
-    pause
-    exit /b 1
+    echo [ERROR] Node.js not found in PATH! Install from nodejs.org
+    pause & exit /b 1
 )
 
-echo [*] Initializing Backend Engine and Datasets...
-python -c "
-import os, sys, subprocess
-ds = ['data/ais_vessel_telemetry.csv', 'data/ocean_metocean_weather.csv', 'data/imo_vessel_registry.csv', 'data/lifecycle_fuel_emissions.csv', 'data/global_ports_and_corridors.csv']
-if not all(os.path.exists(f) for f in ds):
-    subprocess.run([sys.executable, 'scripts/download_all_datasets.py'], check=True)
-if not os.path.exists('models/hydrodynamic_fuel_model.joblib'):
-    subprocess.run([sys.executable, 'ml/train_all_models.py'], check=True)
-"
+if not exist ".env" (
+    echo [WARN] .env not found - app will run in simulation mode.
+    echo        Copy .env.example to .env and add your API keys.
+    echo.
+)
 
-echo [*] Launching FastAPI Backend on http://localhost:8000...
-start "GreenFleet_API" /min cmd /c "python -u backend\main.py"
-timeout /t 2 /nobreak >nul
+echo [*] Launching FastAPI Backend on http://localhost:8000 ...
+start "GreenFleet_API" /min cmd /c "python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload"
+timeout /t 3 /nobreak >nul
 
-echo [*] Launching React 19 Frontend on http://localhost:8443...
-start "GreenFleet_Web" /min cmd /c "node node_modules\vite\bin\vite.js --port 8443 --host 0.0.0.0"
-timeout /t 2 /nobreak >nul
+echo [*] Launching React Frontend on http://localhost:5173 ...
+start "GreenFleet_Web" /min cmd /c "node node_modules\vite\bin\vite.js --port 5173 --host 0.0.0.0"
+timeout /t 3 /nobreak >nul
 
-echo [*] Opening Live Platform in Browser...
-start http://localhost:8443
+start http://localhost:5173
 
 echo.
 echo =======================================================================
-echo   GREENFLEET QUANTUM IS LIVE AND OPERATIONAL
+echo   GREENFLEET QUANTUM IS LIVE
 echo   -------------------------------------------------------------------
-echo   * Web Dashboard:  http://localhost:8443
-echo   * REST API Docs:  http://localhost:8000/docs
-echo   * Live AIS Feed:  ws://localhost:8000/ws/ais/live
-echo   * Database:       data/greenfleet.db (SQLite)
+echo   Web Dashboard   :  http://localhost:5173
+echo   REST API Docs   :  http://localhost:8000/docs
+echo   Health Check    :  http://localhost:8000/api/v1/health
+echo   Service Status  :  http://localhost:8000/api/v1/services/status
+echo   Live AIS Feed   :  ws://localhost:8000/ws/ais/live
+echo   Database        :  data/greenfleet.db (SQLite)
+echo   Run API check   :  python scripts\check_all_apis.py
 echo =======================================================================
 echo.
-echo Press any key to stop all services and exit...
+echo Press any key to STOP all services...
 pause >nul
 
 taskkill /f /im python.exe /fi "WINDOWTITLE eq GreenFleet_API*" >nul 2>&1
 taskkill /f /im node.exe /fi "WINDOWTITLE eq GreenFleet_Web*" >nul 2>&1
-
-echo.
-echo GreenFleet Quantum services shut down cleanly.
+echo [OK] GreenFleet Quantum stopped cleanly.

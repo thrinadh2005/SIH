@@ -14,7 +14,16 @@ import os
 import math
 import json
 import urllib.request
+import urllib.parse
 from typing import Dict, Any, List, Optional
+
+# Load .env credentials
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 
 # Major Global Shipping Corridor Current Vectors (Calibrated from Copernicus CMEMS 1/12° dataset)
 CALIBRATED_CORRIDOR_CURRENTS: Dict[str, Dict[str, Any]] = {

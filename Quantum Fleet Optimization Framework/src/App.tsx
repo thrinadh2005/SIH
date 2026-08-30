@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  LayoutDashboard, Globe2, Navigation, Ship, Leaf, BarChart3, FileCheck2,
+  LayoutDashboard, Globe2, Navigation, Ship, Leaf, BarChart3, FileCheck2, DollarSign, Users, Radio
 } from "lucide-react";
 import Sidebar from "./components/layout/Sidebar";
 import TopBar from "./components/layout/TopBar";
@@ -14,18 +14,21 @@ import FuelSandbox from "./screens/FuelSandbox";
 import CIICompliance from "./screens/CIICompliance";
 import FleetManagement from "./screens/FleetManagement";
 import Reports from "./screens/Reports";
+import CommercialEconomics from "./screens/CommercialEconomics";
+import SwarmConvoyScreen from "./screens/SwarmConvoyScreen";
+import EdgeGatewayScreen from "./screens/EdgeGatewayScreen";
 
 type Page =
   | "overview" | "command" | "optimizer" | "console" | "results"
-  | "fleet" | "fuel" | "benchmark" | "compliance"
+  | "fleet" | "commercial" | "swarm" | "edge" | "fuel" | "benchmark" | "compliance"
   | "notifications" | "health" | "settings";
 
 const mobileNavItems = [
-  { id: "overview",   label: "Overview",  icon: LayoutDashboard },
-  { id: "command",    label: "Map",       icon: Globe2 },
-  { id: "optimizer",  label: "Optimize",  icon: Navigation },
-  { id: "fleet",      label: "Fleet",     icon: Ship },
-  { id: "compliance", label: "Reports",   icon: FileCheck2 },
+  { id: "overview",   label: "Overview",   icon: LayoutDashboard },
+  { id: "command",    label: "Map",        icon: Globe2 },
+  { id: "optimizer",  label: "Optimize",   icon: Navigation },
+  { id: "commercial", label: "Commercial", icon: DollarSign },
+  { id: "compliance", label: "Reports",    icon: FileCheck2 },
 ];
 
 export default function App() {
@@ -45,6 +48,9 @@ export default function App() {
       case "console":        return <OptimizationConsole onNavigate={navigate} />;
       case "results":        return <OptimizationResults onNavigate={navigate} />;
       case "fleet":          return <FleetManagement onNavigate={navigate} />;
+      case "commercial":     return <CommercialEconomics onNavigate={navigate} />;
+      case "swarm":          return <SwarmConvoyScreen onNavigate={navigate} />;
+      case "edge":           return <EdgeGatewayScreen onNavigate={navigate} />;
       case "fuel":           return <FuelSandbox onNavigate={navigate} />;
       case "benchmark":      return <BenchmarkArena />;
       case "compliance":     return <CIICompliance onNavigate={navigate} />;

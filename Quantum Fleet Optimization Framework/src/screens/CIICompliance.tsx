@@ -1,7 +1,19 @@
 import { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
-import { FileText, ShieldCheck, Download, Award, X, CheckCircle, RefreshCw } from "lucide-react";
-import { fetchFleetList, calculateCIIBackend } from "../services/api";
+import {
+  FileText, ShieldCheck, Download, Award, X, CheckCircle, RefreshCw,
+  Landmark, DollarSign, Wallet, FileCode, CheckSquare, Zap, ExternalLink
+} from "lucide-react";
+import {
+  fetchFleetList,
+  calculateCIIBackend,
+  fetchPoseidonScorecard,
+  fetchEuEtsWallet,
+  getEuMrvXmlUrl,
+  getImoDcsXmlUrl,
+  PoseidonScorecardResponse,
+  EuEtsWalletResponse
+} from "../services/api";
 import { CIIBadge } from "../components/ui/StatusBadge";
 
 interface Props {
@@ -19,9 +31,16 @@ const gradeZones = [
 export default function CIICompliance({ onNavigate }: Props) {
   const [fleet, setFleet] = useState<any[]>([]);
   const [selectedVessel, setSelectedVessel] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<"cii" | "mrv" | "poseidon" | "ets">("cii");
   const [showCertificateModal, setShowCertificateModal] = useState(false);
   const [activeFuel, setActiveFuel] = useState("GREEN_METHANOL");
   const [ciiScore, setCiiScore] = useState<any>(null);
+
+  // ESG & Regulatory Data
+  const [poseidon, setPoseidon] = useState<PoseidonScorecardResponse | null>(null);
+  const [etsWallet, setEtsWallet] = useState<EuEtsWalletResponse | null>(null);
+  const [xmlPreview, setXmlPreview] = useState<string>("");
+  const [xmlType, setXmlType] = useState<"EU_MRV" | "IMO_DCS">("EU_MRV");
 
   useEffect(() => {
     fetchFleetList().then((res) => {
@@ -42,8 +61,21 @@ export default function CIICompliance({ onNavigate }: Props) {
       })
         .then(setCiiScore)
         .catch(() => {});
+
+      fetchPoseidonScorecard(selectedVessel.name).then(setPoseidon).catch(() => {});
+      fetchEuEtsWallet().then(setEtsWallet).catch(() => {});
     }
   }, [selectedVessel]);
+
+  // Load XML Preview
+  useEffect(() => {
+    if (!selectedVessel) return;
+    const url = xmlType === "EU_MRV" ? getEuMrvXmlUrl(selectedVessel.name) : getImoDcsXmlUrl(selectedVessel.name);
+    fetch(url)
+      .then((r) => r.text())
+      .then(setXmlPreview)
+      .catch(() => setXmlPreview("<!-- Unable to fetch XML preview -->"));
+  }, [selectedVessel, xmlType]);
 
   if (!selectedVessel) {
     return (
@@ -116,25 +148,27 @@ export default function CIICompliance({ onNavigate }: Props) {
     a.click();
   };
 
+  const handleDownloadXml = () => {
+    const url = xmlType === "EU_MRV" ? getEuMrvXmlUrl(selectedVessel.name) : getImoDcsXmlUrl(selectedVessel.name);
+    window.open(url, "_blank");
+  };
+
   return (
     <div className="h-full overflow-y-auto" style={{ background: "var(--bg-base)" }}>
       <div className="p-4 sm:p-6 space-y-5 animate-fade-in">
-        {/* Header */}
-        <div className="flex flex-wrap items-start gap-4 justify-between">
+        {/* Screen Header */}
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="font-display font-bold text-lg sm:text-xl" style={{ color: "var(--text-1)" }}>
-                IMO CII Compliance & Decarbonization Registry
+                Regulatory Compliance, EU MRV, IMO DCS & ESG Hub
               </h1>
-              <span
-                className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
-                style={{ background: "rgba(16,185,129,0.15)", color: "#10b981" }}
-              >
-                IMO Annex VI
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-emerald-500/15 text-emerald-400">
+                IMO MARPOL Annex VI
               </span>
             </div>
             <p className="text-xs sm:text-sm mt-0.5" style={{ color: "var(--text-3)" }}>
-              Official MARPOL Annex VI Carbon Intensity Indicator ratings and verifiable audit records.
+              One-click regulatory XML filings · Poseidon Principles lender scorecards · EU ETS Carbon Allowance wallet
             </p>
           </div>
 
@@ -163,140 +197,282 @@ export default function CIICompliance({ onNavigate }: Props) {
           </div>
         </div>
 
-        {/* Live Vessel CII Summary Card */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="rounded-xl border p-4 flex items-center justify-between" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
-            <div>
-              <p className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>
-                Attained CII Score
-              </p>
-              <p className="font-mono-data font-bold text-2xl mt-1 text-emerald-400">
-                {ciiScore?.cii_attained || 4.82} <span className="text-xs font-normal text-slate-400">gCO₂/(t·nm)</span>
-              </p>
-              <p className="text-xs mt-1 text-emerald-500 font-semibold">Exceeds IMO 2026 Target by 33.1%</p>
-            </div>
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-black text-2xl text-emerald-400">
-              {ciiScore?.grade || "A"}
-            </div>
-          </div>
-
-          <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
-            <p className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>
-              IMO Required Reference Line
-            </p>
-            <p className="font-mono-data font-bold text-2xl mt-1 text-sky-400">
-              {ciiScore?.cii_target || 7.2} <span className="text-xs font-normal text-slate-400">gCO₂/(t·nm)</span>
-            </p>
-            <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
-              Baseline: {selectedVessel.dwt?.toLocaleString()} DWT Vessel Category
-            </p>
-          </div>
-
-          <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
-            <p className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>
-              Sanction Risk Level
-            </p>
-            <div className="flex items-center gap-2 mt-1">
-              <CheckCircle size={20} className="text-emerald-400" />
-              <p className="font-bold text-lg text-emerald-400">Zero Risk (Exemplary)</p>
-            </div>
-            <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
-              Full access to European SECA & IMO Green Corridors
-            </p>
-          </div>
+        {/* Tab Navigation */}
+        <div className="flex gap-1 p-1 rounded-xl w-fit" style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}>
+          {[
+            ["cii", "IMO CII Trajectory"],
+            ["mrv", "One-Click EU MRV / IMO DCS XML"],
+            ["poseidon", "Poseidon Principles & Sea Cargo"],
+            ["ets", "EU ETS Carbon Allowance Wallet"],
+          ].map(([k, label]) => (
+            <button
+              key={k}
+              onClick={() => setActiveTab(k as any)}
+              className="px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all"
+              style={{
+                background: activeTab === k ? "#10b981" : "transparent",
+                color: activeTab === k ? "white" : "var(--text-3)",
+              }}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
-        {/* 2021-2028 CII Trajectory Chart */}
-        <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <p className="text-sm font-bold" style={{ color: "var(--text-1)" }}>
-                Fleet Decarbonization & CII Trajectory (2021 – 2028 Projected)
-              </p>
-              <p className="text-xs" style={{ color: "var(--text-3)" }}>
-                Attained Carbon Intensity vs IMO Mandatory Reduction Threshold
-              </p>
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB 1: IMO CII TRAJECTORY & SUMMARY
+        ────────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "cii" && (
+          <div className="space-y-4 animate-fade-in">
+            {/* Live Vessel CII Summary Card */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="rounded-xl border p-4 flex items-center justify-between" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                <div>
+                  <p className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>
+                    Attained CII Score
+                  </p>
+                  <p className="font-mono font-bold text-2xl mt-1 text-emerald-400">
+                    {ciiScore?.cii_attained || 4.82} <span className="text-xs font-normal text-slate-400">gCO₂/(t·nm)</span>
+                  </p>
+                  <p className="text-xs mt-1 text-emerald-500 font-semibold">Exceeds IMO 2026 Target by 33.1%</p>
+                </div>
+                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center font-black text-2xl text-emerald-400">
+                  {ciiScore?.grade || "A"}
+                </div>
+              </div>
+
+              <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                <p className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>
+                  IMO Required Reference Line
+                </p>
+                <p className="font-mono font-bold text-2xl mt-1 text-sky-400">
+                  {ciiScore?.cii_target || 7.2} <span className="text-xs font-normal text-slate-400">gCO₂/(t·nm)</span>
+                </p>
+                <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
+                  Baseline: {selectedVessel.dwt?.toLocaleString()} DWT Vessel Category
+                </p>
+              </div>
+
+              <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                <p className="text-xs font-semibold" style={{ color: "var(--text-3)" }}>
+                  Sanction Risk Level
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <CheckCircle size={20} className="text-emerald-400" />
+                  <p className="font-bold text-lg text-emerald-400">Zero Risk (Exemplary)</p>
+                </div>
+                <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>
+                  Full access to European SECA & IMO Green Corridors
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-3 text-xs font-medium">
-              <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" /> Attained CII
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-400" /> IMO Target Limit
-              </span>
+
+            {/* 2021-2028 CII Trajectory Chart */}
+            <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <p className="text-sm font-bold text-white">
+                    Fleet Decarbonization & CII Trajectory (2021 – 2028 Projected)
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Attained Carbon Intensity vs IMO Mandatory Reduction Threshold
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 text-xs font-medium">
+                  <span className="flex items-center gap-1">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" /> Attained CII
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-400" /> IMO Target Limit
+                  </span>
+                </div>
+              </div>
+
+              <ResponsiveContainer width="100%" height={230}>
+                <LineChart data={ciiHistory}>
+                  <XAxis dataKey="year" tick={{ fontSize: 10, fill: "var(--text-4)" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 9, fill: "var(--text-4)" }} axisLine={false} tickLine={false} width={32} domain={[3, 10]} />
+                  <Tooltip
+                    content={({ active, payload }) =>
+                      active && payload?.length ? (
+                        <div className="px-2.5 py-1.5 rounded-lg border text-xs shadow-lg" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                          <p className="font-bold text-slate-200">{(payload[0].payload as any).year}</p>
+                          <p className="text-emerald-400">
+                            Attained: <strong>{payload[0].value} gCO₂/(t·nm)</strong>
+                          </p>
+                          <p className="text-slate-400">IMO Limit: {(payload[0].payload as any).limit} gCO₂/(t·nm)</p>
+                        </div>
+                      ) : null
+                    }
+                  />
+                  <Line dataKey="limit" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="4 2" dot={false} />
+                  <Line dataKey="actual" stroke="#10b981" strokeWidth={3} dot={{ fill: "#10b981", r: 4 }} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
+        )}
 
-          <ResponsiveContainer width="100%" height={230}>
-            <LineChart data={ciiHistory}>
-              <XAxis dataKey="year" tick={{ fontSize: 10, fill: "var(--text-4)" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 9, fill: "var(--text-4)" }} axisLine={false} tickLine={false} width={32} domain={[3, 10]} />
-              <Tooltip
-                content={({ active, payload }) =>
-                  active && payload?.length ? (
-                    <div className="px-2.5 py-1.5 rounded-lg border text-xs shadow-lg" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
-                      <p className="font-bold text-slate-200">{(payload[0].payload as any).year}</p>
-                      <p className="text-emerald-400">
-                        Attained: <strong>{payload[0].value} gCO₂/(t·nm)</strong>
-                      </p>
-                      <p className="text-slate-400">IMO Limit: {(payload[0].payload as any).limit} gCO₂/(t·nm)</p>
-                    </div>
-                  ) : null
-                }
-              />
-              <Line dataKey="limit" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="4 2" dot={false} />
-              <Line dataKey="actual" stroke="#10b981" strokeWidth={3} dot={{ fill: "#10b981", r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB 2: ONE-CLICK EU MRV & IMO DCS XML FILINGS
+        ────────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "mrv" && (
+          <div className="space-y-4 animate-fade-in">
+            <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setXmlType("EU_MRV")}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all"
+                    style={{
+                      background: xmlType === "EU_MRV" ? "#10b981" : "transparent",
+                      borderColor: xmlType === "EU_MRV" ? "#10b981" : "var(--border)",
+                      color: xmlType === "EU_MRV" ? "white" : "var(--text-3)",
+                    }}
+                  >
+                    EU THETIS-MRV XML (v2024.1)
+                  </button>
+                  <button
+                    onClick={() => setXmlType("IMO_DCS")}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all"
+                    style={{
+                      background: xmlType === "IMO_DCS" ? "#10b981" : "transparent",
+                      borderColor: xmlType === "IMO_DCS" ? "#10b981" : "var(--border)",
+                      color: xmlType === "IMO_DCS" ? "white" : "var(--text-3)",
+                    }}
+                  >
+                    IMO GISIS DCS XML (MARPOL Reg 27)
+                  </button>
+                </div>
 
-        {/* Grade Breakdown Table */}
-        <div className="rounded-xl border overflow-hidden" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
-          <div className="px-4 py-3 border-b" style={{ borderColor: "var(--border)" }}>
-            <p className="text-sm font-bold" style={{ color: "var(--text-1)" }}>
-              IMO Grade Boundaries & Fleet Categorization
-            </p>
+                <button
+                  onClick={handleDownloadXml}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-emerald-500 text-white shadow-md hover:bg-emerald-600"
+                >
+                  <Download size={14} /> Download Official XML Filing
+                </button>
+              </div>
+
+              {/* Code Inspector Box */}
+              <div className="rounded-lg border p-3 font-mono text-xs overflow-x-auto max-h-96 bg-slate-950/90 text-slate-300">
+                <pre>{xmlPreview}</pre>
+              </div>
+            </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs" style={{ minWidth: 460 }}>
-              <thead>
-                <tr style={{ borderBottom: `1px solid var(--border)` }}>
-                  {["Grade", "Operational Rating", "CII Range gCO₂/(t·nm)", "Regulatory Consequence"].map((h) => (
-                    <th key={h} className="px-4 py-2.5 text-left font-semibold uppercase tracking-wide" style={{ color: "var(--text-4)" }}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {gradeZones.map((z) => (
-                  <tr key={z.grade} className="border-b transition-colors hover:bg-slate-800/20" style={{ borderColor: "var(--border)" }}>
-                    <td className="px-4 py-2.5">
-                      <CIIBadge grade={z.grade} />
-                    </td>
-                    <td className="px-4 py-2.5 font-bold" style={{ color: z.color }}>
-                      {z.desc}
-                    </td>
-                    <td className="px-4 py-2.5 font-mono-data" style={{ color: "var(--text-2)" }}>
-                      {z.min} – {z.max}
-                    </td>
-                    <td className="px-4 py-2.5" style={{ color: "var(--text-3)" }}>
-                      {z.grade === "A"
-                        ? "Preferred green corridor port incentives"
-                        : z.grade === "B"
-                        ? "Full regulatory approval"
-                        : z.grade === "C"
-                        ? "Compliant with baseline"
-                        : z.grade === "D"
-                        ? "Mandatory corrective action plan (SEEMP III)"
-                        : "Detention & potential port denial"}
-                    </td>
-                  </tr>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB 3: POSEIDON PRINCIPLES & SEA CARGO CHARTER
+        ────────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "poseidon" && poseidon && (
+          <div className="space-y-4 animate-fade-in">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="rounded-xl border p-4 flex items-center justify-between" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                <div>
+                  <p className="text-xs font-semibold text-slate-400">Climate Alignment Delta</p>
+                  <p className="font-mono font-bold text-2xl text-emerald-400 mt-1">
+                    {poseidon.climate_alignment_delta_pct}%
+                  </p>
+                  <p className="text-xs text-emerald-400 font-semibold">Exceeds Bank Decarbonization Trajectory</p>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <Landmark size={22} />
+                </div>
+              </div>
+
+              <div className="rounded-xl border p-4 flex items-center justify-between" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                <div>
+                  <p className="text-xs font-semibold text-slate-400">Lender ESG Rating</p>
+                  <p className="font-mono font-bold text-2xl text-sky-400 mt-1">
+                    {poseidon.lender_sustainability_rating}
+                  </p>
+                  <p className="text-xs text-slate-400">Sustainability-Linked Loan Grade</p>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                  <Award size={22} />
+                </div>
+              </div>
+
+              <div className="rounded-xl border p-4 flex items-center justify-between" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                <div>
+                  <p className="text-xs font-semibold text-slate-400">Interest Margin Discount</p>
+                  <p className="font-mono font-bold text-2xl text-purple-400 mt-1">
+                    -{poseidon.interest_margin_discount_bps} bps
+                  </p>
+                  <p className="text-xs text-purple-300 font-semibold">
+                    ${poseidon.annual_debt_servicing_saved_usd.toLocaleString()}/yr Saved
+                  </p>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                  <DollarSign size={22} />
+                </div>
+              </div>
+            </div>
+
+            {/* Recognized Commercial Banks */}
+            <div className="rounded-xl border p-4" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+              <p className="font-bold text-sm text-white mb-2">Poseidon Principles Signatory Bank Portfolio Alignment</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                {poseidon.qualifying_commercial_banks.map((bank, i) => (
+                  <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg border bg-slate-900/60" style={{ borderColor: "var(--border)" }}>
+                    <CheckSquare size={14} className="text-emerald-400 shrink-0" />
+                    <span className="text-slate-200">{bank}</span>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* ─────────────────────────────────────────────────────────────────────────────
+            TAB 4: EU ETS AUTOMATED CARBON WALLET
+        ────────────────────────────────────────────────────────────────────────────── */}
+        {activeTab === "ets" && etsWallet && (
+          <div className="space-y-4 animate-fade-in">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="rounded-xl border p-4 flex items-center justify-between" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                <div>
+                  <p className="text-xs font-semibold text-slate-400">EUA Spot Price</p>
+                  <p className="font-mono font-bold text-2xl text-sky-400 mt-1">
+                    €{etsWallet.eua_spot_price_eur_tonne} <span className="text-xs text-slate-400">/ tCO₂</span>
+                  </p>
+                  <p className="text-[11px] text-slate-400">${etsWallet.eua_spot_price_usd_tonne} USD · EEX Leipzig</p>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                  <DollarSign size={22} />
+                </div>
+              </div>
+
+              <div className="rounded-xl border p-4 flex items-center justify-between" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                <div>
+                  <p className="text-xs font-semibold text-slate-400">Total Liability (2026 100%)</p>
+                  <p className="font-mono font-bold text-2xl text-emerald-400 mt-1">
+                    €{etsWallet.total_financial_liability_eur.toLocaleString()}
+                  </p>
+                  <p className="text-[11px] text-emerald-400 font-semibold">{etsWallet.required_eua_allowances} Allowances Required</p>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <ShieldCheck size={22} />
+                </div>
+              </div>
+
+              <div className="rounded-xl border p-4 flex items-center justify-between" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                <div>
+                  <p className="text-xs font-semibold text-slate-400">Company EUA Wallet Balance</p>
+                  <p className="font-mono font-bold text-2xl text-purple-400 mt-1">
+                    {etsWallet.company_eua_wallet_balance} EUA
+                  </p>
+                  <p className="text-[11px] text-emerald-400 font-semibold">
+                    +{etsWallet.allowance_net_surplus_deficit} Surplus Buffer
+                  </p>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                  <Wallet size={22} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Certificate Modal */}
@@ -313,7 +489,7 @@ export default function CIICompliance({ onNavigate }: Props) {
               <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wider">
                 Official Green Fleet Carbon Intensity Indicator (CII) Audit Certificate
               </p>
-              <p className="text-[11px] font-mono-data text-slate-400">CERTIFICATE ID: {certId}</p>
+              <p className="text-[11px] font-mono text-slate-400">CERTIFICATE ID: {certId}</p>
             </div>
 
             <div className="p-4 rounded-xl border space-y-3" style={{ background: "var(--bg-base)", borderColor: "var(--border)" }}>
@@ -338,7 +514,7 @@ export default function CIICompliance({ onNavigate }: Props) {
                 </div>
               </div>
 
-              <div className="p-2.5 rounded bg-slate-900 border border-slate-700 text-[10px] font-mono-data break-all text-slate-300">
+              <div className="p-2.5 rounded bg-slate-900 border border-slate-700 text-[10px] font-mono break-all text-slate-300">
                 <span className="text-emerald-400 font-bold block mb-0.5">SHA-256 CRYPTOGRAPHIC PROOF:</span>
                 {sha256Proof}
               </div>

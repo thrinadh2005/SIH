@@ -20,6 +20,9 @@ const pageLabels: Record<string, string> = {
   fuel:          "Fuel & Decarbonization Sandbox",
   benchmark:     "Algorithm Benchmark Arena",
   compliance:    "IMO CII Compliance Monitor",
+  commercial:    "Commercial Fleet Economics & Bunker Arbitrage",
+  swarm:         "Convoy Swarm Optimization",
+  edge:          "Maritime IoT & Edge Bridge",
   notifications: "Risk & Notifications",
   health:        "Data & Model Health",
   settings:      "Platform Settings",
@@ -74,173 +77,161 @@ export default function TopBar({ activePage, onNavigate, onMenuOpen }: Props) {
   const sessionDanger = sessionAge > 3600;
 
   return (
-    <header
-      className="flex items-center gap-2 shrink-0 px-3 sm:px-4 border-b relative"
-      style={{ height: 52, background: "var(--bg-surface)", borderColor: "var(--border)", zIndex: 20 }}
-    >
-      {/* Mobile hamburger */}
-      <button className="flex lg:hidden p-2 rounded-lg" onClick={onMenuOpen} style={{ color: "var(--text-3)" }}
-        onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--bg-hover)")}
-        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}>
-        <Menu size={18} />
-      </button>
-
-      {/* Logo + page title */}
-      <div className="flex-1 min-w-0 flex items-center gap-3">
-        <div className="hidden sm:flex items-center gap-2 shrink-0">
-          <div className="w-6 h-6 rounded-md flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg,#10b981,#06b6d4)" }}>
-            <span className="text-[10px] font-bold text-white">EQ</span>
-          </div>
-          <span className="text-xs font-semibold hidden md:inline" style={{ color: "var(--text-4)" }}>Egreen Quanta</span>
-          <span className="text-xs hidden md:inline" style={{ color: "var(--border)" }}>/</span>
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm font-display font-semibold truncate" style={{ color: "var(--text-1)" }}>
-            {pageLabels[activePage] || activePage}
-          </p>
-          <p className="text-[10px] hidden md:block" style={{ color: "var(--text-5)" }}>
-            SIH-26138 · QPSO Maritime Optimisation
-          </p>
-        </div>
-      </div>
-
-      {/* Security + connection indicators */}
-      <div className="hidden lg:flex items-center gap-2 shrink-0">
-        {/* WS status */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold"
-          style={{ background: wsConnected ? "rgba(16,185,129,0.08)" : "rgba(239,68,68,0.08)",
-            border: `1px solid ${wsConnected ? "rgba(16,185,129,0.25)" : "rgba(239,68,68,0.25)"}`,
-            color: wsConnected ? "#10b981" : "#ef4444" }}>
-          {wsConnected ? <Wifi size={10} /> : <WifiOff size={10} />}
-          <span>{wsConnected ? "AIS" : "DISC"}</span>
-          {wsConnected && <span style={{ color: "var(--text-4)" }}>{latency}ms</span>}
-        </div>
-
-        {/* Live data badge */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold"
-          style={{ background: "rgba(6,182,212,0.08)", border: "1px solid rgba(6,182,212,0.2)", color: "#06b6d4" }}>
-          <span className="w-1.5 h-1.5 rounded-full animate-live-pulse" style={{ background: "#06b6d4" }} />
-          LIVE · {lastUpdate}
-        </div>
-
-        {/* Threat level */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold"
-          style={{ background: `${threatColor}12`, border: `1px solid ${threatColor}30`, color: threatColor }}>
-          <Shield size={10} />
-          {threatLevel.toUpperCase()}
-        </div>
-
-        {/* TLS indicator */}
-        <div className="enc-indicator hidden xl:flex">
-          <Lock size={8} />
-          TLS 1.3 · AES-256
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-0.5 shrink-0">
-        {/* Search */}
-        <button onClick={() => { setSearchOpen(!searchOpen); logAction("SEARCH_OPEN"); }}
-          className="p-2 rounded-lg transition-colors" style={{ color: "var(--text-3)" }}
+    <>
+      <header
+        className="flex items-center gap-2 shrink-0 px-4 sm:px-6 border-b relative"
+        style={{ height: 58, background: "var(--bg-surface)", borderColor: "var(--border)", zIndex: 20 }}
+      >
+        {/* Mobile hamburger */}
+        <button className="flex lg:hidden p-2 rounded-xl" onClick={onMenuOpen} style={{ color: "var(--text-3)" }}
           onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--bg-hover)")}
           onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}>
-          <Search size={15} />
+          <Menu size={20} />
         </button>
 
-        {/* Refresh */}
-        <button className="hidden sm:flex p-2 rounded-lg transition-colors" style={{ color: "var(--text-3)" }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--bg-hover)")}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}>
-          <RefreshCw size={13} />
-        </button>
-
-        {/* Alerts */}
-        <button onClick={() => { setAlertCount(0); onNavigate("reports"); logAction("VIEW_ALERTS"); }}
-          className="relative p-2 rounded-lg transition-colors" style={{ color: "var(--text-3)" }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--bg-hover)")}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}>
-          <Bell size={15} />
-          {alertCount > 0 && (
-            <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold text-white animate-glow-pulse"
-              style={{ background: "#ef4444" }}>
-              {alertCount > 9 ? "9+" : alertCount}
-            </span>
-          )}
-        </button>
-
-        {/* Theme toggle */}
-        <button onClick={toggle} className="theme-toggle mx-1"
-          style={{ background: theme === "dark" ? "#0e2240" : "#d1d5db" }}
-          title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
-          <div className="theme-toggle-thumb flex items-center justify-center" style={{ left: theme === "dark" ? 2 : 20 }}>
-            {theme === "dark" ? <Moon size={10} color="#06b6d4" /> : <Sun size={10} color="#f59e0b" />}
-          </div>
-        </button>
-
-        {/* User pill */}
-        <div className="relative ml-1 pl-2 border-l" style={{ borderColor: "var(--border)" }}>
-          <button onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg transition-colors"
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--bg-hover)")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}>
-            <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+        {/* Logo + page title */}
+        <div className="flex-1 min-w-0 flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2.5 shrink-0">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-md"
               style={{ background: "linear-gradient(135deg,#10b981,#06b6d4)" }}>
-              {user.avatar}
+              <span className="text-xs font-bold text-white tracking-wider">GQ</span>
             </div>
-            <div className="hidden lg:block text-left">
-              <p className="text-xs font-semibold leading-none" style={{ color: "var(--text-1)" }}>{user.role}</p>
-              <p className="text-[10px] leading-none mt-0.5" style={{ color: "var(--text-4)" }}>
-                Session {formatSession(sessionAge)}
-              </p>
-            </div>
-            <ChevronDown size={11} style={{ color: "var(--text-4)" }} className="hidden lg:block" />
+            <span className="text-sm font-bold tracking-tight hidden md:inline" style={{ color: "var(--text-1)" }}>
+              GreenFleet Quantum
+            </span>
+            <span className="text-xs hidden md:inline text-slate-500">/</span>
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-sm sm:text-base font-display font-bold truncate" style={{ color: "var(--text-1)" }}>
+              {pageLabels[activePage] || activePage}
+            </h1>
+          </div>
+        </div>
+
+        {/* Status Indicators & Live Telemetry Pill */}
+        <div className="hidden md:flex items-center gap-2 text-xs">
+          {/* WS status */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-xs font-bold"
+            style={{
+              background: wsConnected ? "rgba(16,185,129,0.12)" : "rgba(239,68,68,0.12)",
+              color: wsConnected ? "#10b981" : "#ef4444",
+              border: `1px solid ${wsConnected ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`,
+            }}>
+            {wsConnected ? <Wifi size={13} /> : <WifiOff size={13} />}
+            <span>{wsConnected ? `LIVE · ${latency}ms` : "OFFLINE"}</span>
+          </div>
+
+          {/* Security status */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border"
+            style={{ borderColor: "var(--border)", color: "var(--text-2)", background: "var(--bg-card)" }}>
+            <span className="w-2 h-2 rounded-full" style={{ background: threatColor }} />
+            <span className="capitalize">{threatLevel} Level</span>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Search */}
+          <button onClick={() => { setSearchOpen(!searchOpen); logAction("SEARCH_OPEN"); }}
+            className="p-2 rounded-xl transition-colors" style={{ color: "var(--text-2)" }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--bg-hover)")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
+            title="Search Platform">
+            <Search size={17} />
           </button>
 
-          {/* User dropdown */}
-          {userMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-64 rounded-xl border shadow-2xl z-50 animate-fade-in-fast"
-              style={{ background: "var(--bg-surface)", borderColor: "var(--border)" }}>
-              <div className="p-3 border-b" style={{ borderColor: "var(--border)" }}>
-                <p className="text-xs font-semibold" style={{ color: "var(--text-1)" }}>{user.name}</p>
-                <p className="text-[10px]" style={{ color: "var(--text-4)" }}>{user.email}</p>
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  <span className="enc-indicator"><Shield size={8} />{user.role}</span>
-                  {user.mfaVerified && <span className="enc-indicator"><Lock size={8} />MFA ✓</span>}
+          {/* Alerts */}
+          <button onClick={() => { setAlertCount(0); onNavigate("reports"); logAction("VIEW_ALERTS"); }}
+            className="relative p-2 rounded-xl transition-colors" style={{ color: "var(--text-2)" }}
+            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--bg-hover)")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
+            title="Alerts">
+            <Bell size={17} />
+            {alertCount > 0 && (
+              <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold text-white animate-pulse"
+                style={{ background: "#ef4444" }}>
+                {alertCount > 9 ? "9+" : alertCount}
+              </span>
+            )}
+          </button>
+
+          {/* Theme toggle */}
+          <button onClick={toggle} className="theme-toggle mx-1 shadow-sm"
+            style={{ background: theme === "dark" ? "#1a3b68" : "#cbdbe9" }}
+            title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}>
+            <div className="theme-toggle-thumb flex items-center justify-center" style={{ left: theme === "dark" ? 2 : 20 }}>
+              {theme === "dark" ? <Moon size={11} color="#06b6d4" /> : <Sun size={11} color="#f59e0b" />}
+            </div>
+          </button>
+
+          {/* User pill */}
+          <div className="relative ml-1 pl-2 border-l" style={{ borderColor: "var(--border)" }}>
+            <button onClick={() => setUserMenuOpen(!userMenuOpen)}
+              className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl transition-colors"
+              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--bg-hover)")}
+              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md"
+                style={{ background: "linear-gradient(135deg,#10b981,#06b6d4)" }}>
+                {user.avatar}
+              </div>
+              <div className="hidden lg:block text-left">
+                <p className="text-xs font-bold leading-none" style={{ color: "var(--text-1)" }}>{user.role}</p>
+                <p className="text-[10px] leading-none mt-1" style={{ color: "var(--text-4)" }}>
+                  Session {formatSession(sessionAge)}
+                </p>
+              </div>
+              <ChevronDown size={12} className="hidden lg:block" style={{ color: "var(--text-3)" }} />
+            </button>
+
+            {/* User dropdown */}
+            {userMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl border shadow-2xl z-50 animate-fade-in-fast p-2"
+                style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+                <div className="p-3 border-b" style={{ borderColor: "var(--border)" }}>
+                  <p className="text-sm font-bold" style={{ color: "var(--text-1)" }}>{user.name}</p>
+                  <p className="text-xs" style={{ color: "var(--text-4)" }}>{user.email}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
+                      {user.role}
+                    </span>
+                    {user.mfaVerified && (
+                      <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/20 text-cyan-400 text-[10px] font-bold">
+                        MFA ✓
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="p-3 text-xs font-mono space-y-1" style={{ color: "var(--text-3)" }}>
+                  <div>JWT: <span style={{ color: "#8b5cf6" }}>{user.jwtFragment}</span></div>
+                  <div>Session: {formatSession(sessionAge)}</div>
+                </div>
+                <div className="p-2 border-t" style={{ borderColor: "var(--border)" }}>
+                  <button onClick={() => setUserMenuOpen(false)}
+                    className="w-full py-2 rounded-xl text-xs font-bold bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-colors">
+                    Sign Out
+                  </button>
                 </div>
               </div>
-              <div className="p-2 text-[10px] font-mono" style={{ color: "var(--text-4)" }}>
-                <div className="px-2 py-1">JWT: <span style={{ color: "#a78bfa" }}>{user.jwtFragment}</span></div>
-                <div className="px-2 py-1">Session: {formatSession(sessionAge)} {sessionDanger ? "⚠ expiring" : "✓"}</div>
-                <div className="px-2 py-1">User ID: {user.id}</div>
-              </div>
-              <div className="p-2 border-t" style={{ borderColor: "var(--border)" }}>
-                <button onClick={() => setUserMenuOpen(false)}
-                  className="w-full py-1.5 rounded-lg text-xs font-semibold"
-                  style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444" }}>
-                  Sign Out
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Search overlay */}
-      {searchOpen && (
-        <div className="absolute top-full left-0 right-0 border-b shadow-xl z-50 animate-fade-in-fast p-3"
-          style={{ background: "var(--bg-surface)", borderColor: "var(--border)" }}>
-          <div className="flex items-center gap-2 rounded-lg px-3 py-2 border"
-            style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
-            <Search size={13} style={{ color: "var(--text-4)" }} />
-            <input autoFocus placeholder="Search vessels, voyages, alerts… (Esc to close)"
-              className="flex-1 bg-transparent text-sm outline-none"
-              style={{ color: "var(--text-1)" }}
-              onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)} />
-            <kbd className="text-[9px] px-1 py-0.5 rounded" style={{ background: "var(--border)", color: "var(--text-4)" }}>ESC</kbd>
+            )}
           </div>
         </div>
-      )}
-    </header>
+
+        {/* Search overlay */}
+        {searchOpen && (
+          <div className="absolute top-full left-0 right-0 border-b shadow-2xl z-50 animate-fade-in-fast p-4"
+            style={{ background: "var(--bg-surface)", borderColor: "var(--border)" }}>
+            <div className="flex items-center gap-3 rounded-xl px-4 py-2.5 border"
+              style={{ background: "var(--bg-input)", borderColor: "var(--border)" }}>
+              <Search size={16} style={{ color: "var(--text-3)" }} />
+              <input autoFocus placeholder="Search vessels, voyages, bunker hubs, alerts… (Esc to close)"
+                className="flex-1 bg-transparent text-sm outline-none"
+                style={{ color: "var(--text-1)" }}
+                onKeyDown={(e) => e.key === "Escape" && setSearchOpen(false)} />
+              <kbd className="text-[10px] px-2 py-1 rounded font-mono" style={{ background: "var(--bg-hover)", color: "var(--text-3)" }}>ESC</kbd>
+            </div>
+          </div>
+        )}
+      </header>
+    </>
   );
 }

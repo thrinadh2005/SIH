@@ -2,17 +2,21 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Globe2, Navigation, Ship, Leaf, BarChart3,
   FileCheck2, Bell, ChevronLeft, ChevronRight, Zap, X, Shield, Lock,
+  DollarSign, Users, Radio, Cpu
 } from "lucide-react";
 import { useSecurity } from "../../context/SecurityContext";
 
 const navItems = [
-  { id: "overview",    label: "Overview",           icon: LayoutDashboard, badge: null },
-  { id: "command",     label: "Command Center",     icon: Globe2,          badge: null },
-  { id: "optimizer",   label: "Voyage Optimizer",   icon: Navigation,      badge: null },
-  { id: "fleet",       label: "Fleet",              icon: Ship,            badge: "5" },
-  { id: "fuel",        label: "Fuel & Decarbonization", icon: Leaf,        badge: null },
-  { id: "benchmark",   label: "Benchmark Arena",    icon: BarChart3,       badge: null },
-  { id: "compliance",  label: "Compliance & Reports", icon: FileCheck2,    badge: "1" },
+  { id: "overview",    label: "Overview",               icon: LayoutDashboard, badge: null },
+  { id: "command",     label: "Command Center",         icon: Globe2,          badge: null },
+  { id: "optimizer",   label: "Voyage Optimizer",       icon: Navigation,      badge: null },
+  { id: "fleet",       label: "Fleet",                  icon: Ship,            badge: "5" },
+  { id: "commercial",  label: "Commercial Economics",   icon: DollarSign,      badge: "NEW" },
+  { id: "swarm",       label: "Convoy Swarm",           icon: Users,           badge: "JIT" },
+  { id: "edge",        label: "IoT & Edge Bridge",      icon: Radio,           badge: "LIVE" },
+  { id: "fuel",        label: "Fuel & Decarbonization", icon: Leaf,            badge: null },
+  { id: "benchmark",   label: "Benchmark Arena",        icon: BarChart3,       badge: null },
+  { id: "compliance",  label: "Compliance & Reports",   icon: FileCheck2,      badge: "1" },
 ];
 
 interface Props {
@@ -103,10 +107,10 @@ export default function Sidebar({ active, onNavigate, notifications, mobileOpen,
                     </span>
                     {item.badge && (
                       <span
-                        className="text-xs font-mono px-1.5 py-0.5 rounded-full"
+                        className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full"
                         style={{
-                          background: isActive ? "#10b981" : "var(--bg-hover)",
-                          color: isActive ? "white" : "var(--text-3)",
+                          background: item.badge === "NEW" ? "#38bdf8" : item.badge === "JIT" ? "#a855f7" : item.badge === "LIVE" ? "#10b981" : (isActive ? "#10b981" : "var(--bg-hover)"),
+                          color: "white",
                         }}
                       >
                         {item.badge}
@@ -153,7 +157,7 @@ export default function Sidebar({ active, onNavigate, notifications, mobileOpen,
             </button>
           )}
 
-          {/* Security footer */}
+          {/* Security & Edge status footer */}
           {expanded && (
             <div className="mt-2 mx-1 p-2 rounded-lg border" style={{ background: "rgba(16,185,129,0.04)", borderColor: "rgba(16,185,129,0.15)" }}>
               <div className="flex items-center gap-1.5 mb-1">
@@ -165,7 +169,7 @@ export default function Sidebar({ active, onNavigate, notifications, mobileOpen,
               </div>
               <div className="flex items-center gap-1 text-[9px] font-mono" style={{ color: "var(--text-5)" }}>
                 <Lock size={8} />
-                <span className="truncate">{user.role} · MFA ✓ · TLS 1.3</span>
+                <span className="truncate">NMEA / Satcom · TLS 1.3</span>
               </div>
             </div>
           )}

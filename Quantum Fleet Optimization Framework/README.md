@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌊 GreenFleet Quantum (`SIH-26138`)
+# GreenFleet Quantum (`SIH-26138`)
 ### *Quantum-Inspired Multi-Objective Maritime Decarbonization & Real-Time Speed Optimization Platform*
 
 **Smart India Hackathon 2026 — Project SagarQuantum**  
@@ -14,9 +14,11 @@
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React 19](https://img.shields.io/badge/React-19.0-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
-[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-v4.0-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![XGBoost](https://img.shields.io/badge/XGBoost-2.1.4-EB7234.svg)](https://xgboost.readthedocs.io/)
-[![Qiskit](https://img.shields.io/badge/Qiskit-1.3.0-6929C4.svg?logo=qiskit&logoColor=white)](https://qiskit.org/)
+[![Qiskit](https://img.shields.io/badge/Qiskit-2.5.0-6929C4.svg?logo=qiskit&logoColor=white)](https://qiskit.org/)
+[![IBM Quantum](https://img.shields.io/badge/IBM_Quantum-Heron_156Q-1192E8.svg)](https://quantum.ibm.com)
+[![Copernicus](https://img.shields.io/badge/Copernicus-Marine_CMEMS-009FDA.svg)](https://data.marine.copernicus.eu)
+[![AISStream](https://img.shields.io/badge/AISStream-Live_AIS-00B4D8.svg)](https://aisstream.io)
+[![OpenMeteo](https://img.shields.io/badge/OpenMeteo-Weather-FF9F1C.svg)](https://open-meteo.com)
 [![SQLite 3](https://img.shields.io/badge/SQLite-3-003B57.svg?logo=sqlite&logoColor=white)](https://sqlite.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)](https://www.docker.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -150,10 +152,21 @@ GreenFleet Quantum integrates **Quantum-Inspired Metaheuristics (HQOA)**, **Phys
 
 ### 4.1 Detailed Architectural Layer Walkthrough (Figure 2)
 
-#### 1. Data Ingestion & Live Ocean Sensing Layer
-* **OpenMeteo Marine LIVE API:** Ingests real-time significant wave height ($H_s$), peak wave period ($T_p$), wind velocity ($V_{\text{wind}}$), and wind angle ($\theta_{\text{wind}}$).
-* **Copernicus Marine Environment Monitoring Service (CMEMS):** Supplies high-resolution $1/12^\circ$ ocean current velocity vectors ($u_o, v_o$) to calculate true vessel speed through water.
-* **AIS Telemetry Archive (USCG NAVCEN):** Ingests 50,000 real-world kinematic records across international container, bulk carrier, and tanker voyages.
+#### 1. Live API Integrations (All 4 Configured)
+
+| Service | Role | Status | Key |
+|---------|------|--------|-----|
+| **IBM Quantum Platform** | 156-qubit QAOA circuit execution on Heron hardware | Configured | `IBM_QUANTUM_API_TOKEN` |
+| **Copernicus Marine CMEMS** | 1/12-degree ocean current vectors (uo, vo) | Configured | `COPERNICUS_USERNAME/PASSWORD` |
+| **AISStream WebSocket** | Real-time vessel AIS position tracking | Configured | `AISSTREAM_API_KEY` |
+| **OpenMeteo Weather** | Wind, wave height, metocean data | Always Live | No key required |
+
+Setup: copy `.env.example` to `.env` and fill in your keys, or run `python scripts/check_all_apis.py` to verify.
+
+#### 2. Data Ingestion & Live Ocean Sensing Layer
+* **OpenMeteo Marine LIVE API:** Ingests real-time significant wave height ($H_s$), peak wave period ($T_p$), wind velocity ($V_{\text{wind}}$), and wind angle ($\theta_{\text{wind}}$). No API key required.
+* **Copernicus Marine CMEMS:** Supplies high-resolution $1/12^\circ$ ocean current velocity vectors ($u_o, v_o$) to calculate true vessel speed through water. Registered credentials required.
+* **AISStream WebSocket:** Real-time AIS vessel position, speed, and heading data streamed via WebSocket for live fleet tracking. Free API key from [aisstream.io](https://aisstream.io).
 * **IMO 4th GHG & DNV LCA Database:** Provides standardized Well-to-Wake (WtW) and Tank-to-Wake (TtW) carbon emission factors and carbon tariff rates.
 
 #### 2. Physics-Informed ML Surrogate Layer
