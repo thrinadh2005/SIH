@@ -93,10 +93,12 @@ class OptimizeVoyageRequest(BaseModel):
 
 
 class CIICalculateRequest(BaseModel):
-    fuel_mt: float
-    distance_nm: float
+    fuel_mt: Optional[float] = None
+    fuel_burn_mt: Optional[float] = None
+    distance_nm: float = 8280.0
     vessel_type: str = "CONTAINER_15000TEU"
     fuel_type: str = "VLSFO"
+    dwt: Optional[float] = None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -267,11 +269,19 @@ def get_reports_and_audit():
 quantum_circuit_engine = RealQuantumCircuitService()
 
 @app.post("/api/v1/quantum/real-trial")
-def run_real_quantum_trial(legs: int = Query(5), shots: int = Query(1024)):
+@app.get("/api/v1/quantum/real-trial")
+@app.post("/api/v1/quantum/trial")
+@app.get("/api/v1/quantum/trial")
+def run_real_quantum_trial(
+    legs: int = Query(5),
+    n_qubits: Optional[int] = Query(None),
+    shots: int = Query(1024)
+):
     """
     Executes a real-time gate-level QAOA / VQE quantum circuit trial.
     """
-    return quantum_circuit_engine.execute_quantum_trial(n_waypoint_legs=legs, shots=shots)
+    waypoint_legs = n_qubits if n_qubits is not None else legs
+    return quantum_circuit_engine.execute_quantum_trial(n_waypoint_legs=waypoint_legs, shots=shots)
 
 
 @app.get("/api/v1/quantum/status")
@@ -441,7 +451,8 @@ def run_benchmark_arena(req: OptimizeVoyageRequest):
 @app.post("/api/v1/cii/calculate")
 def calculate_cii(req: CIICalculateRequest):
     hydro = HydrodynamicModel(vessel_type=req.vessel_type)
-    return hydro.calculate_cii_score(req.fuel_mt, req.distance_nm, req.fuel_type)
+    fuel = req.fuel_mt if req.fuel_mt is not None else (req.fuel_burn_mt if req.fuel_burn_mt is not None else 450.0)
+    return hydro.calculate_cii_score(fuel, req.distance_nm, req.fuel_type)
 
 
 @app.get("/api/v1/certificate/view")
