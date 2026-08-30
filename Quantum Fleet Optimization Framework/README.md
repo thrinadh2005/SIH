@@ -1,10 +1,16 @@
+<div align="center">
+
 # 🌊 GreenFleet Quantum (`SIH-26138`)
 ### *Quantum-Inspired Multi-Objective Maritime Decarbonization & Real-Time Speed Optimization Platform*
 
 **Smart India Hackathon 2026 — Project SagarQuantum**  
 *Problem Statement Code: SIH-26138 | Organization: Egreen Quanta | Category: Software & Clean-Tech*
 
----
+<br/>
+
+<img src="docs/images/greenfleet_hero_banner.jpg" alt="GreenFleet Quantum Hero Banner" width="100%" style="border-radius: 12px; box-shadow: 0 12px 40px rgba(0, 200, 255, 0.2);" />
+
+<br/><br/>
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React 19](https://img.shields.io/badge/React-19.0-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
@@ -17,6 +23,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests Passing](https://img.shields.io/badge/Tests-18%2F18%20Passed-brightgreen.svg)]()
 
+</div>
+
 ---
 
 ## 📑 Master Table of Contents
@@ -24,18 +32,21 @@
 1. [Executive Summary & Key Highlights](#1-executive-summary--key-highlights)
 2. [Problem Statement & Maritime Context](#2-problem-statement--maritime-context)
 3. [Proposed Solution & Core Innovations](#3-proposed-solution--core-innovations)
-4. [Mathematical & Physical Modeling](#4-mathematical--physical-modeling)
-5. [System Architecture & Data Flow](#5-system-architecture--data-flow)
-6. [Detailed Technology Stack](#6-detailed-technology-stack)
-7. [Repository File & Directory Structure](#7-repository-file--directory-structure)
-8. [Interactive Frontend Dashboards & Modules](#8-interactive-frontend-dashboards--modules)
-9. [REST API & WebSocket Reference](#9-rest-api--websocket-reference)
-10. [Benchmark Performance & Results](#10-benchmark-performance--results)
-11. [Installation & Getting Started](#11-installation--getting-started)
-12. [Docker & Containerized Deployment](#12-docker--containerized-deployment)
-13. [Testing & Production Verification](#13-testing--production-verification)
-14. [Future Scope & Roadmap](#14-future-scope--roadmap)
-15. [License & Acknowledgements](#15-license--acknowledgements)
+4. [System Architecture & Data Flow](#4-system-architecture--data-flow)
+5. [End-to-End User Workflow](#5-end-to-end-user-workflow)
+6. [Real-Time Operational Tech Flow](#6-real-time-operational-tech-flow)
+7. [Physics-Informed ML Training Pipeline](#7-physics-informed-ml-training-pipeline)
+8. [Mathematical & Physical Modeling](#8-mathematical--physical-modeling)
+9. [Interactive Dashboards & Visual Showcase](#9-interactive-dashboards--visual-showcase)
+10. [Detailed Technology Stack](#10-detailed-technology-stack)
+11. [Repository File & Directory Structure](#11-repository-file--directory-structure)
+12. [REST API & WebSocket Reference](#12-rest-api--websocket-reference)
+13. [Benchmark Performance & Results](#13-benchmark-performance--results)
+14. [Installation & Getting Started](#14-installation--getting-started)
+15. [Docker & Containerized Deployment](#12-docker--containerized-deployment)
+16. [Testing & Production Verification](#16-testing--production-verification)
+17. [Future Scope & Roadmap](#17-future-scope--roadmap)
+18. [License & Acknowledgements](#18-license--acknowledgements)
 
 ---
 
@@ -58,11 +69,11 @@
 ```
 
 ### 🌟 Key Performance Indicators (KPIs)
-* **14.0% to 18.2% Verified Fuel Reduction:** Achieved by exploiting non-linear cubic propulsion mechanics and real-time ocean current velocity vectors.
-* **Sub-150ms Real-Time Convergence:** Powered by Vectorized Quantum Particle Swarm Optimization (QPSO) and Quantum Genetic Algorithms (QGA) executing at bridge-operational speeds.
-* **Physics-Informed Surrogate ML Suite ($R^2 = 0.9989$):** Evaluates hydrodynamic hull resistance, directional wave drag, and SFOC engine curves in $<0.42\text{ ms}$ per leg.
-* **Multi-Fuel LCA Sandbox:** Real-time Well-to-Wake (WtW) and Tank-to-Wake (TtW) carbon accounting for VLSFO, LNG, Bio-Methanol, Green Ammonia, and Liquid Hydrogen.
-* **Cryptographic Proof of Compliance:** Instant SHA-256 tamper-evident IMO Grade-A digital certificates with PDF and HTML export capabilities.
+* ⚡ **14.0% to 18.2% Verified Fuel Reduction:** Achieved by exploiting non-linear cubic propulsion mechanics and real-time ocean current velocity vectors.
+* ⚛️ **Sub-150ms Real-Time Convergence:** Powered by Vectorized Quantum Particle Swarm Optimization (QPSO) and Quantum Genetic Algorithms (QGA) executing at bridge-operational speeds.
+* 🤖 **Physics-Informed Surrogate ML Suite ($R^2 = 0.9989$):** Evaluates hydrodynamic hull resistance, directional wave drag, and SFOC engine curves in $<0.42\text{ ms}$ per leg.
+* 🌿 **Multi-Fuel LCA Sandbox:** Real-time Well-to-Wake (WtW) and Tank-to-Wake (TtW) carbon accounting for VLSFO, LNG, Bio-Methanol, Green Ammonia, and Liquid Hydrogen.
+* 🔒 **Cryptographic Proof of Compliance:** Instant SHA-256 tamper-evident IMO Grade-A digital certificates with PDF and HTML export capabilities.
 
 ---
 
@@ -76,53 +87,20 @@ Commercial shipping transports **over 90% of global trade**, burning hundreds of
 2. **IMO Carbon Intensity Indicator (CII):** Annually grades vessels on an operational efficiency scale from **Grade A to Grade E**. Vessels scoring **Grade D for 3 consecutive years or Grade E for 1 year** face mandatory corrective action plans, commercial chartering boycotts, and port detentions.
 3. **EU Emissions Trading System (EU ETS):** Legally imposes a direct carbon tax of **$€75\text{ to } €90\text{ per tonne of } CO_2\text{e}$** on maritime voyages entering or departing European ports.
 
-```
-                              THE MULTI-OBJECTIVE MARITIME OPTIMIZATION MAZE
-    ┌───────────────────────────────────┐                  ┌───────────────────────────────────┐
-    │       FLEET OPERATING DECISIONS   │                  │        DYNAMIC SEA CONSTRAINTS    │
-    │ • Fleet Mix (Capesize/Panamax/TEU)│        VS        │ • Strict Port Arrival Windows     │
-    │ • Dynamic Waypoint Speed Profiles │                  │ • Non-Linear Directional Wave Drag│
-    │ • Alternative Fuel Selection      │                  │ • Variable Ocean Current Vectors  │
-    │ • Cold-Ironing Shore Power At Berth│                 │ • Vessel Draft & Depth Limits     │
-    └───────────────────────────────────┘                  └───────────────────────────────────┘
-                                            │
-                                            ▼
-           MATHEMATICAL FORMULATION: Non-Linear, High-Dimensional, NP-Hard Combinatorial Problem
-```
+<br/>
 
-### 2.3 Limitations of Conventional Routing Software
-* **The Local Optima Trap:** Classical Genetic Algorithms (GA) and standard Particle Swarm Optimization (PSO) get trapped in local cost minima when encountering opposing currents or storm wave barriers.
-* **Computational Latency:** Exact mathematical programming solvers (MILP/MINLP) take hours to converge over multi-waypoint oceanic corridors, making real-time bridge tactical speed adjustments impossible during shifting weather.
-* **Static Flat-Speed Schedules:** Standard voyage management enforces uniform speed schedules across all legs, completely ignoring the cubic law of hydrodynamic resistance ($P \propto v^3$) and dynamic sea states.
+<div align="center">
+  <img src="docs/images/problem_solution_impact.png" alt="The Problem vs Our Solution vs The Impact" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.15);" />
+  <p><em>Figure 1: High-Level Overview — The Problem, Our Quantum Solution & The Verified Operational Impact</em></p>
+</div>
+
+<br/>
 
 ---
 
 ## 3. Proposed Solution & Core Innovations
 
 GreenFleet Quantum integrates **Quantum-Inspired Metaheuristics (HQOA)**, **Physics-Informed Machine Learning Surrogate Models**, and **Live Ocean Sensing (OpenMeteo + Copernicus CMEMS)** into a unified real-time operational platform.
-
-```
-┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                GREENFLEET QUANTUM ARCHITECTURE                                  │
-├───────────────────────────────┬─────────────────────────────────┬───────────────────────────────┤
-│   1. LIVE OCEAN SENSING       │  2. PHYSICS-INFORMED ML         │  3. 3-TIER HQOA QUANTUM CORE  │
-│   • OpenMeteo Wave & Wind API │  • XGBoost Regressor (R²=0.9989)│  • Tier 1: Q-Bit Superposition│
-│   • Copernicus Current Vectors│  • Random Forest Ensemble       │  • Tier 2: QPSO Tunneling     │
-│   • 50,000 AIS Telemetry Rows │  • Calm Water + Wave + SFOC     │  • Tier 3: Pareto Memetic     │
-└───────────────┬───────────────┴────────────────┬────────────────┴───────────────┬───────────────┘
-                │                                │                                │
-                ▼                                ▼                                ▼
-┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                           FASTAPI ASYNCHRONOUS BACKEND & SQLITE 3 DB                            │
-│           • REST API  • WebSockets (/ws/ais/live)  • SHA-256 Tamper-Evident IMO Certificates    │
-└───────────────────────────────────────────────┬─────────────────────────────────────────────────┘
-                                                │
-                                                ▼
-┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                            REACT 19 + TAILWIND V4 MARITIME INTERFACE                            │
-│  • Interactive Leaflet GIS  • 5-Way Benchmark Arena  • Fuel LCA Sandbox  • 1-Click PDF Certs   │
-└─────────────────────────────────────────────────────────────────────────────────────────────────┘
-```
 
 ### 3.1 Three-Tier Hybrid Quantum-Classical Optimization Algorithm (HQOA)
 1. **Tier 1 — Quantum Genetic Algorithm (QGA) with Q-Bit Superposition:**  
@@ -139,9 +117,45 @@ GreenFleet Quantum integrates **Quantum-Inspired Metaheuristics (HQOA)**, **Phys
 
 ---
 
-## 4. Mathematical & Physical Modeling
+## 4. System Architecture & Data Flow
 
-### 4.1 Physics-Informed Hydrodynamic Fuel Model
+<div align="center">
+  <img src="docs/images/system_architecture_diagram.png" alt="System Architecture Diagram" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 120, 255, 0.18);" />
+  <p><em>Figure 2: Complete End-to-End System Architecture — Ingestion, ML Surrogate, HQOA Solver, Microservices & Deployment</em></p>
+</div>
+
+---
+
+## 5. End-to-End User Workflow
+
+<div align="center">
+  <img src="docs/images/end_to_end_user_workflow.png" alt="End-to-End User Workflow" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 150, 255, 0.18);" />
+  <p><em>Figure 3: End-to-End User Journey — From Fleet Selection to Live Ocean Intelligence, Quantum Optimization & Verified IMO Audit</em></p>
+</div>
+
+---
+
+## 6. Real-Time Operational Tech Flow
+
+<div align="center">
+  <img src="docs/images/realtime_tech_flow.png" alt="Real-Time Operational Tech Flow" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 200, 150, 0.18);" />
+  <p><em>Figure 4: Real-Time Operational Tech Flow — 3-Second AIS Telemetry Broadcast, Physics Ingestion & Sub-150ms Dynamic Re-Optimization</em></p>
+</div>
+
+---
+
+## 7. Physics-Informed ML Training Pipeline
+
+<div align="center">
+  <img src="docs/images/physics_informed_ml_pipeline.png" alt="Physics-Informed ML Training Pipeline" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(70, 130, 180, 0.18);" />
+  <p><em>Figure 5: Multi-Model Machine Learning Training Pipeline — Feature Extraction, Physics Constraints, Benchmarking & Deployment</em></p>
+</div>
+
+---
+
+## 8. Mathematical & Physical Modeling
+
+### 8.1 Physics-Informed Hydrodynamic Fuel Model
 The total required propulsion power $P_{\text{total}}$ is modeled as the sum of calm-water resistance, added wave resistance, aerodynamic wind resistance, and engine SFOC efficiency:
 
 $$P_{\text{total}}(v, \Delta, H_s, \theta_{\text{wave}}, V_{\text{wind}}, \theta_{\text{wind}}) = P_{\text{calm}}(v, \Delta) + \Delta P_{\text{wave}}(v, H_s, \theta_{\text{wave}}) + \Delta P_{\text{wind}}(v, V_{\text{wind}}, \theta_{\text{wind}})$$
@@ -165,7 +179,7 @@ $$\text{Fuel Burn Rate (MT/day)} = \frac{P_{\text{total}}(\text{kW}) \times \tex
 
 ---
 
-### 4.2 IMO Carbon Intensity Indicator (CII) Formulation
+### 8.2 IMO Carbon Intensity Indicator (CII) Formulation
 Attained CII measures operational grams of $CO_2$ emitted per cargo capacity-nautical mile:
 
 $$\text{Attained CII} = \frac{\sum_{j} \left(\text{Fuel Consumed}_j \times C_{F,j}\right)}{\text{DWT} \times \text{Distance (nm)}} \quad \left[\text{g } CO_2 / \text{DWT}\cdot\text{nm}\right]$$
@@ -183,52 +197,31 @@ Where $a, c$ are IMO vessel-specific reference parameters and $Z$ is the annual 
 
 ---
 
-## 5. System Architecture & Data Flow
+## 9. Interactive Dashboards & Visual Showcase
 
-```
-┌───────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ 1. DATA INGESTION & ENVIRONMENTAL SENSING                                                         │
-│   • OpenMeteo Marine LIVE API        ➔ Significant Wave Height (Hs), Wind Velocity & Angle        │
-│   • Copernicus Marine Service (CMEMS)➔ Ocean Current Velocity Vectors (uo, vo)                   │
-│   • USCG NAVCEN AIS Telemetry        ➔ 50,000 Verified Vessel Kinematic Records (8.0 MB)          │
-│   • IMO 4th GHG & DNV LCA Database   ➔ Well-to-Wake (WtW) Multi-Fuel Emissions & Tariffs          │
-└───────────────────────────────────────────────┬───────────────────────────────────────────────────┘
-                                                │
-┌───────────────────────────────────────────────▼───────────────────────────────────────────────────┐
-│ 2. PHYSICS-INFORMED HYDRODYNAMIC ML SURROGATE SUITE (models/)                                     │
-│   • Physics-Informed XGBoost Regressor (Primary Production: R² = 0.9989, MAPE = 1.32%)            │
-│   • Random Forest Ensemble & Gradient Boosting Baselines                                          │
-│   • Continuous Inference Latency: < 0.42 ms per voyage leg evaluation                             │
-└───────────────────────────────────────────────┬───────────────────────────────────────────────────┘
-                                                │
-┌───────────────────────────────────────────────▼───────────────────────────────────────────────────┐
-│ 3. 3-TIER HYBRID QUANTUM-CLASSICAL OPTIMIZATION ENGINE (HQOA Core)                                │
-│   • Tier 1: Quantum Genetic Algorithm (QGA) with Q-Bit Superposition & Rotation Gates            │
-│   • Tier 2: Quantum Particle Swarm Optimization (QPSO) with Delta-Potential Tunneling             │
-│   • Tier 3: Pareto Memetic Multi-Objective Refinement (Fuel + Carbon Tax + Demurrage)             │
-│   • Gate-Level Real Quantum Circuits (QAOA / VQE Parameterized Ansatz & Expectation Values)       │
-└───────────────────────────────────────────────┬───────────────────────────────────────────────────┘
-                                                │
-┌───────────────────────────────────────────────▼───────────────────────────────────────────────────┐
-│ 4. FASTAPI ASYNC MICROSERVICES & SQLITE PERSISTENCE (http://localhost:8000)                       │
-│   • Relational Persistence Engine: SQLite (data/greenfleet.db)                                    │
-│   • Real-Time WebSockets: /ws/ais/live (3s Telemetry Feed) & /ws/quantum/stream                   │
-│   • Security Hardening: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, CORS Validation        │
-│   • Cryptographic Proof: SHA-256 Tamper-Evident IMO Carbon Intensity Indicator Certificates       │
-└───────────────────────────────────────────────┬───────────────────────────────────────────────────┘
-                                                │
-┌───────────────────────────────────────────────▼───────────────────────────────────────────────────┐
-│ 5. REACT 19 + TAILWIND V4 CLIENT (http://localhost:8443)                                          │
-│   • Live Interactive Leaflet GIS Navigation Map with Real Vessel Orientation                      │
-│   • Dynamic 5-Way Optimization Benchmark Arena & Pareto Frontier Visualizer                       │
-│   • Alternative Fuel Decarbonization Sandbox (VLSFO, LNG, Bio-Methanol, Ammonia, Hydrogen)        │
-│   • 1-Click IMO Grade-A Audit Certificate Generator & PDF Exporter                                │
-└───────────────────────────────────────────────────────────────────────────────────────────────────┘
-```
+<div align="center">
+
+### 🛰️ Real-Time AIS Command Center & Global Maritime GIS
+<img src="docs/images/command_center_preview.jpg" alt="Real-Time Maritime Command Center" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 150, 255, 0.2);" />
+<p><em>Figure 6: Live Interactive Fleet Command Center with Real-Time AIS Vessel Telemetry, Dynamic Speed Profiles, Global Shipping Corridors, and IMO CII Rating Badges</em></p>
+
+<br/>
+
+### ⚛️ 5-Way Quantum Optimization Tournament & Pareto Frontier Visualizer
+<img src="docs/images/quantum_benchmark_preview.jpg" alt="Quantum Benchmark Tournament Arena" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(138, 43, 226, 0.2);" />
+<p><em>Figure 7: Head-to-Head Optimizer Arena displaying Convergence Rates, Pareto Multi-Objective Frontier Tradeoffs, Delta-Potential Energy Wells, and Fuel Savings Breakdown</em></p>
+
+<br/>
+
+### 📜 Tamper-Proof Cryptographic IMO Certificate & Fuel Sandbox
+<img src="docs/images/decarbonization_certificate_preview.jpg" alt="IMO Decarbonization & Compliance Certificate" width="100%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 255, 170, 0.2);" />
+<p><em>Figure 8: SHA-256 Digitally Signed IMO Grade-A Compliance Certificate and Multi-Fuel Well-to-Wake Life Cycle Assessment (LCA) Sandbox</em></p>
+
+</div>
 
 ---
 
-## 6. Detailed Technology Stack
+## 10. Detailed Technology Stack
 
 | Layer | Technology | Version | Purpose & Strategic Rationale |
 | :--- | :--- | :--- | :--- |
@@ -248,13 +241,25 @@ Where $a, c$ are IMO vessel-specific reference parameters and $Z$ is the annual 
 
 ---
 
-## 7. Repository File & Directory Structure
+## 11. Repository File & Directory Structure
 
 ```
 d:\PROJECTS\SIH\
 ├── .gitignore                                 # Root Git Ignore rules
 ├── requirements.txt                           # Root Python Dependencies Specification
 ├── start.bat                                  # Master 1-Click Launch Script
+├── docs/                                      # DOCUMENTATION ASSETS & DIAGRAMS
+│   └── images/                                # High-resolution UI previews & architecture figures
+│       ├── command_center_preview.jpg         # Real-time AIS Command Center UI preview
+│       ├── decarbonization_certificate_preview.jpg # Cryptographic IMO Certificate & Sandbox UI
+│       ├── end_to_end_user_workflow.png       # Complete 8-step user journey infographic
+│       ├── greenfleet_hero_banner.jpg         # Master platform hero visual banner
+│       ├── physics_informed_ml_pipeline.png   # ML surrogate training pipeline infographic
+│       ├── problem_solution_impact.png        # Problem, Solution & Impact overview
+│       ├── quantum_benchmark_preview.jpg      # Quantum benchmark tournament arena UI preview
+│       ├── realtime_tech_flow.png             # Real-time operational tech flow diagram
+│       └── system_architecture_diagram.png    # Tiered system architecture diagram
+│
 └── Quantum Fleet Optimization Framework/
     ├── .env.example                           # Template Environment Variables
     ├── .gitattributes                         # Git LFS & Diff Rules
@@ -318,7 +323,6 @@ d:\PROJECTS\SIH\
     │   │   ├── layout/                        # Sidebar & TopBar navigation components
     │   │   ├── map/                           # Interactive Leaflet Maritime Map
     │   │   └── ui/                            # KPICards, StatusBadges, Buttons, Modals
-    │   ├── context/                           # React State Context Providers
     │   ├── screens/                           # 10 DEDICATED APPLICATION SCREENS
     │   │   ├── BenchmarkArena.tsx             # 5-Way Optimization Tournament Arena
     │   │   ├── CIICompliance.tsx              # IMO CII Rating & Compliance Forecaster
@@ -342,38 +346,11 @@ d:\PROJECTS\SIH\
 
 ---
 
-## 8. Interactive Frontend Dashboards & Modules
-
-The frontend is organized into 10 specialized interactive screens designed for fleet managers, ship captains, and environmental auditors:
-
-1. **Executive Fleet Overview (`Overview.tsx`):**  
-   High-level fleet decarbonization KPIs, total fuel saved, emissions avoided vs baseline, CII grade distribution pie charts, and real-time fleet activity feeds.
-2. **Real-Time AIS Command Center (`CommandCenter.tsx`):**  
-   Subscribes to `/ws/ais/live` for 3-second live kinematic updates, vessel positions, dynamic heading angles, engine load meters, and weather alert overlays.
-3. **Interactive Maritime GIS Navigation (`MaritimeMap.tsx`):**  
-   Hardware-accelerated Leaflet map rendering global shipping corridors (Malacca Strait, Suez Canal, Bab-el-Mandeb, Gibraltar, English Channel, Transpacific) with weather isobar lines and vessel position markers.
-4. **Dynamic Voyage Speed Optimizer (`VoyageOptimizer.tsx`):**  
-   Allows operators to select vessel class, cargo deadweight, departure/arrival ports, and target arrival window, then triggers the 3-Tier HQOA solver.
-5. **5-Way Optimization Benchmark Arena (`BenchmarkArena.tsx`):**  
-   Head-to-head tournament mode comparing HQOA against Quantum PSO, Quantum GA, Classical GA, Classical PSO, and Dijkstra algorithms in real time.
-6. **Pareto Frontier & Speed Trajectory Visualizer (`OptimizationResults.tsx`):**  
-   Interactive multi-objective tradeoff curves plotting Fuel Burn (MT) vs Voyage Duration (Hours) with waypoint-by-waypoint speed recommendation charts.
-7. **Alternative Fuel Decarbonization Sandbox (`FuelSandbox.tsx`):**  
-   Simulates voyage economics under VLSFO, LNG, Bio-Methanol, Green Ammonia, and Hydrogen, factoring in Well-to-Wake LCA and port cold-ironing shore power.
-8. **IMO CII Rating & Compliance Manager (`CIICompliance.tsx`):**  
-   Calculates attained CII against IMO reference curves, predicts annual grade transitions (A to E), and displays financial risk exposure under the EU ETS carbon tax.
-9. **Cryptographic Certificate Generator (`Reports.tsx`):**  
-   Generates verifiable SHA-256 tamper-evident IMO Grade-A compliance certificates with 1-click printable HTML/PDF export.
-10. **Fleet Management & Telemetry Editor (`FleetManagement.tsx`):**  
-    Full CRUD management of fleet assets, engine specifications, deadweight capacities, and real-time operational statuses.
-
----
-
-## 9. REST API & WebSocket Reference
+## 12. REST API & WebSocket Reference
 
 The FastAPI microservice runs on `http://localhost:8000` with auto-generated interactive Swagger UI documentation at `http://localhost:8000/docs`.
 
-### 9.1 Core REST Endpoints
+### 12.1 Core REST Endpoints
 
 | HTTP Method | Endpoint Path | Description | Sample Query / Body |
 | :--- | :--- | :--- | :--- |
@@ -390,7 +367,7 @@ The FastAPI microservice runs on `http://localhost:8000` with auto-generated int
 | `POST` | `/api/v1/certificate/generate`| Generates an official cryptographically signed SHA-256 IMO audit certificate. | `{"voyage_id": "VOY-2026-001", "vessel_name": "Oceanic Vanguard"}` |
 | `GET` | `/api/v1/health` | Service health status, database connection check, and uptime. | `None` |
 
-### 9.2 Real-Time WebSocket Feeds
+### 12.2 Real-Time WebSocket Feeds
 
 | WebSocket URL | Protocol | Message Frequency | Payload Content |
 | :--- | :--- | :--- | :--- |
@@ -399,7 +376,7 @@ The FastAPI microservice runs on `http://localhost:8000` with auto-generated int
 
 ---
 
-## 10. Benchmark Performance & Results
+## 13. Benchmark Performance & Results
 
 GreenFleet Quantum was benchmarked over **1,000 simulated voyages** across the Singapore-Rotterdam corridor (8,280 nautical miles) under varying sea states ($H_s \in [0.5\text{m}, 4.5\text{m}]$):
 
@@ -424,9 +401,9 @@ GreenFleet Quantum was benchmarked over **1,000 simulated voyages** across the S
 
 ---
 
-## 11. Installation & Getting Started
+## 14. Installation & Getting Started
 
-### 11.1 System Prerequisites
+### 14.1 System Prerequisites
 * **Operating System:** Windows 10/11, macOS, or Linux (Ubuntu 20.04+)
 * **Python:** Version `3.10` or higher (`3.11` recommended)
 * **Node.js:** Version `20.0.0` or higher
@@ -434,7 +411,7 @@ GreenFleet Quantum was benchmarked over **1,000 simulated voyages** across the S
 
 ---
 
-### 11.2 One-Click Launch (Windows)
+### 14.2 One-Click Launch (Windows)
 Simply double-click the master launch script at the repository root:
 ```cmd
 start.bat
@@ -448,7 +425,7 @@ The automated script will:
 
 ---
 
-### 11.3 Manual Installation & Launch
+### 14.3 Manual Installation & Launch
 
 #### Step 1: Clone the Repository
 ```bash
@@ -480,7 +457,7 @@ npm run dev
 
 ---
 
-## 12. Docker & Containerized Deployment
+## 15. Docker & Containerized Deployment
 
 Deploy the complete multi-service stack with a single command using Docker Compose:
 
@@ -500,7 +477,7 @@ docker-compose down
 
 ---
 
-## 13. Testing & Production Verification
+## 16. Testing & Production Verification
 
 GreenFleet Quantum includes a comprehensive automated test suite verifying hydrodynamic mathematics, quantum convergence, API routes, and database integrity.
 
@@ -538,7 +515,7 @@ Ran 18 tests in 15.998s -> ALL 18 PRODUCTION TESTS PASSED!
 
 ---
 
-## 14. Future Scope & Roadmap
+## 17. Future Scope & Roadmap
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -557,7 +534,7 @@ Ran 18 tests in 15.998s -> ALL 18 PRODUCTION TESTS PASSED!
 
 ---
 
-## 15. License & Acknowledgements
+## 18. License & Acknowledgements
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
@@ -569,4 +546,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 * **USCG NAVCEN** — National AIS Telemetry Sample Archives.
 
 ---
-*Developed with ❤️ for Smart India Hackathon 2026 (SIH-26138)*
+<div align="center">
+  <sub>Developed with ❤️ for Smart India Hackathon 2026 (SIH-26138)</sub>
+</div>
