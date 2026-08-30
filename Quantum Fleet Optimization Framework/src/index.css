@@ -1,0 +1,276 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import 'tailwindcss';
+
+/* ─── Dark theme (default) ───────────────────────────────── */
+:root,
+[data-theme="dark"] {
+  --bg-base:     #020d1a;
+  --bg-surface:  #040f1f;
+  --bg-card:     #071428;
+  --bg-hover:    #0a1a34;
+  --bg-input:    #071428;
+  --border:      #0e2240;
+  --border-sub:  #0a1a34;
+  --text-1:      #e2e8f0;
+  --text-2:      #94a3b8;
+  --text-3:      #64748b;
+  --text-4:      #475569;
+  --text-5:      #334155;
+
+  /* Tailwind token aliases */
+  --background: var(--bg-base);
+  --foreground:  var(--text-1);
+  --card:        var(--bg-card);
+  --card-foreground: var(--text-1);
+  --primary:    #10b981;
+  --primary-foreground: #ffffff;
+  --secondary:  var(--bg-hover);
+  --secondary-foreground: var(--text-2);
+  --muted:      var(--bg-hover);
+  --muted-foreground: var(--text-3);
+  --accent:     #06b6d4;
+  --accent-foreground: #ffffff;
+  --border-color: var(--border);
+  --ring:       #10b981;
+  --radius:     10px;
+
+  /* overlay tints for charts / maps */
+  --ocean-grad-a: #062040;
+  --ocean-grad-b: #020d1a;
+  --map-continent: #0a1e38;
+  --map-grid: rgba(255,255,255,0.06);
+  --shimmer-a: #071428;
+  --shimmer-b: #0a1a34;
+}
+
+/* ─── Light theme ────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg-base:     #f0f4f8;
+  --bg-surface:  #ffffff;
+  --bg-card:     #ffffff;
+  --bg-hover:    #f1f5f9;
+  --bg-input:    #f8fafc;
+  --border:      #dde3eb;
+  --border-sub:  #e8eef5;
+  --text-1:      #0f172a;
+  --text-2:      #334155;
+  --text-3:      #475569;
+  --text-4:      #64748b;
+  --text-5:      #94a3b8;
+
+  --background: var(--bg-base);
+  --foreground:  var(--text-1);
+  --card:        var(--bg-card);
+  --card-foreground: var(--text-1);
+  --primary:    #10b981;
+  --primary-foreground: #ffffff;
+  --secondary:  var(--bg-hover);
+  --secondary-foreground: var(--text-2);
+  --muted:      var(--bg-hover);
+  --muted-foreground: var(--text-3);
+  --accent:     #0891b2;
+  --accent-foreground: #ffffff;
+  --border-color: var(--border);
+  --ring:       #10b981;
+  --radius:     10px;
+
+  --ocean-grad-a: #bfdbfe;
+  --ocean-grad-b: #dbeafe;
+  --map-continent: #93c5fd;
+  --map-grid: rgba(15,23,42,0.06);
+  --shimmer-a: #f1f5f9;
+  --shimmer-b: #e2e8f0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground:  var(--foreground);
+  --color-card:        var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary:    var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:  var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:      var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent:     var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border:     var(--border-color);
+  --color-ring:       var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ─── Base ───────────────────────────────────────────────── */
+html, body, #root {
+  height: 100%;
+  background-color: var(--bg-base);
+  color: var(--text-1);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+* { box-sizing: border-box; }
+
+/* ─── Scrollbars ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-5); }
+
+/* ─── Font helpers ───────────────────────────────────────── */
+.font-display  { font-family: 'Space Grotesk', system-ui, sans-serif; }
+.font-mono-data { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+
+/* ─── Skeleton ───────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--shimmer-a) 25%, var(--shimmer-b) 50%, var(--shimmer-a) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ─── Animations ─────────────────────────────────────────── */
+@keyframes live-pulse    { 0%,100%{opacity:1} 50%{opacity:.25} }
+@keyframes vessel-ping   { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(3);opacity:0} }
+@keyframes slide-in-right{ from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+@keyframes fade-in       { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fade-in-fast  { from{opacity:0} to{opacity:1} }
+@keyframes slide-up      { from{transform:translateY(100%)} to{transform:translateY(0)} }
+@keyframes drawer-in     { from{transform:translateX(-100%);opacity:0} to{transform:translateX(0);opacity:1} }
+@keyframes float         { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+@keyframes counter-in    { from{opacity:0;transform:scale(0.85) translateY(4px)} to{opacity:1;transform:scale(1) translateY(0)} }
+@keyframes radar-sweep   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes scan-line     { 0%{transform:translateY(-100%);opacity:0} 10%{opacity:0.5} 90%{opacity:0.5} 100%{transform:translateY(400%);opacity:0} }
+@keyframes glow-pulse    { 0%,100%{box-shadow:0 0 4px 1px rgba(16,185,129,0.3)} 50%{box-shadow:0 0 12px 3px rgba(16,185,129,0.6)} }
+@keyframes border-glow   { 0%,100%{border-color:rgba(16,185,129,0.3)} 50%{border-color:rgba(16,185,129,0.8)} }
+@keyframes data-stream   { 0%{opacity:0;transform:translateX(-4px)} 50%{opacity:1} 100%{opacity:0;transform:translateX(4px)} }
+@keyframes spin-slow     { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes shake         { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+@keyframes number-roll   { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes progress-fill { from{width:0%} to{width:var(--target-width,100%)} }
+
+.animate-live-pulse       { animation: live-pulse 1.4s ease-in-out infinite; }
+.animate-vessel-ping      { animation: vessel-ping 2.2s ease-out infinite; }
+.animate-slide-in-right   { animation: slide-in-right 0.28s cubic-bezier(.22,1,.36,1); }
+.animate-fade-in          { animation: fade-in 0.4s cubic-bezier(.22,1,.36,1); }
+.animate-fade-in-fast     { animation: fade-in-fast 0.2s ease-out; }
+.animate-slide-up         { animation: slide-up 0.3s cubic-bezier(.22,1,.36,1); }
+.animate-drawer-in        { animation: drawer-in 0.28s cubic-bezier(.22,1,.36,1); }
+.animate-float            { animation: float 3s ease-in-out infinite; }
+.animate-counter-in       { animation: counter-in 0.5s cubic-bezier(.22,1,.36,1); }
+.animate-radar-sweep      { animation: radar-sweep 4s linear infinite; }
+.animate-scan-line        { animation: scan-line 3s ease-in-out infinite; }
+.animate-glow-pulse       { animation: glow-pulse 2s ease-in-out infinite; }
+.animate-spin-slow        { animation: spin-slow 8s linear infinite; }
+.animate-number-roll      { animation: number-roll 0.4s cubic-bezier(.22,1,.36,1) both; }
+
+/* ─── Theme transition on all bg/border ─────────────────── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+/* Don't slow down transform/opacity keyframe animations */
+.animate-live-pulse, .animate-vessel-ping, .animate-slide-in-right,
+.animate-fade-in, .animate-fade-in-fast, .animate-slide-up, .animate-drawer-in,
+.animate-float, .animate-counter-in, .animate-radar-sweep, .animate-scan-line,
+.animate-glow-pulse, .animate-spin-slow, .animate-number-roll { transition: none; }
+
+/* ─── Security / data UI components ─────────────────────── */
+.security-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.enc-indicator {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 6px; border-radius: 4px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+  background: rgba(16,185,129,0.1); color: #10b981;
+  border: 1px solid rgba(16,185,129,0.2);
+}
+
+/* ─── Leaflet popup override ─────────────────────────────── */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip { background: transparent !important; box-shadow: none !important; border: none !important; }
+.leaflet-popup-content { margin: 0 !important; }
+.maritime-popup .leaflet-popup-content-wrapper { padding: 0; border-radius: 12px; overflow: hidden; }
+
+/* ─── Scan effect for security screens ──────────────────── */
+.scan-overlay {
+  position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(16,185,129,0.02) 2px, rgba(16,185,129,0.02) 4px);
+}
+
+/* ─── Glassmorphism card ─────────────────────────────────── */
+.glass-card {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+/* ─── Animated gradient text ─────────────────────────────── */
+@keyframes gradient-shift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+.gradient-text {
+  background: linear-gradient(135deg, #10b981, #06b6d4, #7c3aed, #10b981);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* ─── Map ────────────────────────────────────────────────── */
+.ocean-map {
+  background: radial-gradient(ellipse at 30% 60%, var(--ocean-grad-a) 0%, var(--ocean-grad-b) 60%);
+  transition: background 0.3s ease;
+}
+
+/* ─── Status dot ─────────────────────────────────────────── */
+.status-live::before {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #06b6d4;
+  margin-right: 6px;
+  animation: live-pulse 1.5s ease-in-out infinite;
+}
+
+/* ─── Mobile bottom nav ──────────────────────────────────── */
+.mobile-nav-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* ─── Input range thumb ──────────────────────────────────── */
+input[type=range] { accent-color: #10b981; }
+
+/* ─── Theme toggle button ────────────────────────────────── */
+.theme-toggle {
+  width: 40px; height: 22px;
+  border-radius: 11px;
+  position: relative;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+.theme-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3);
+  transition: left 0.2s cubic-bezier(.22,1,.36,1);
+}

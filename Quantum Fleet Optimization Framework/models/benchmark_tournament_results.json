@@ -1,0 +1,158 @@
+{
+  "SIN_ROT": [
+    {
+      "algorithm": "Hybrid HQOA (QGA+QPSO)",
+      "runtime_ms": 129.4,
+      "iterations": 47,
+      "fuel_consumed_mt": 3469.2,
+      "fuel_saved_pct": 40.96,
+      "cost_saved_usd": 1422015.66,
+      "co2_avoided_mt": 7717.7,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Pure QPSO (Quantum)",
+      "runtime_ms": 176.0,
+      "iterations": 50,
+      "fuel_consumed_mt": 3469.4,
+      "fuel_saved_pct": 40.96,
+      "cost_saved_usd": 1422156.0,
+      "co2_avoided_mt": 7717.0,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Classical PSO",
+      "runtime_ms": 342.2,
+      "iterations": 90,
+      "fuel_consumed_mt": 3469.2,
+      "fuel_saved_pct": 40.96,
+      "cost_saved_usd": 1422015.66,
+      "co2_avoided_mt": 7717.7,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Classical GA",
+      "runtime_ms": 372.9,
+      "iterations": 100,
+      "fuel_consumed_mt": 3469.2,
+      "fuel_saved_pct": 40.96,
+      "cost_saved_usd": 1422028.9,
+      "co2_avoided_mt": 7717.5,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Dijkstra Baseline",
+      "runtime_ms": 0.5,
+      "iterations": 5,
+      "fuel_consumed_mt": 3789.8,
+      "fuel_saved_pct": 35.51,
+      "cost_saved_usd": 1388578.78,
+      "co2_avoided_mt": 6689.5,
+      "cii_grade": "E"
+    }
+  ],
+  "SHA_BOM": [
+    {
+      "algorithm": "Hybrid HQOA (QGA+QPSO)",
+      "runtime_ms": 104.6,
+      "iterations": 47,
+      "fuel_consumed_mt": 1881.1,
+      "fuel_saved_pct": 40.97,
+      "cost_saved_usd": 826149.92,
+      "co2_avoided_mt": 4185.1,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Pure QPSO (Quantum)",
+      "runtime_ms": 125.1,
+      "iterations": 50,
+      "fuel_consumed_mt": 1881.2,
+      "fuel_saved_pct": 40.97,
+      "cost_saved_usd": 826145.66,
+      "co2_avoided_mt": 4185.0,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Classical PSO",
+      "runtime_ms": 236.1,
+      "iterations": 90,
+      "fuel_consumed_mt": 1881.0,
+      "fuel_saved_pct": 40.97,
+      "cost_saved_usd": 826054.8,
+      "co2_avoided_mt": 4185.5,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Classical GA",
+      "runtime_ms": 283.5,
+      "iterations": 100,
+      "fuel_consumed_mt": 1881.0,
+      "fuel_saved_pct": 40.97,
+      "cost_saved_usd": 826054.8,
+      "co2_avoided_mt": 4185.5,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Dijkstra Baseline",
+      "runtime_ms": 0.7,
+      "iterations": 5,
+      "fuel_consumed_mt": 2054.5,
+      "fuel_saved_pct": 35.52,
+      "cost_saved_usd": 808167.46,
+      "co2_avoided_mt": 3629.2,
+      "cii_grade": "E"
+    }
+  ],
+  "RST_ROT": [
+    {
+      "algorithm": "Hybrid HQOA (QGA+QPSO)",
+      "runtime_ms": 131.4,
+      "iterations": 47,
+      "fuel_consumed_mt": 2466.4,
+      "fuel_saved_pct": 40.98,
+      "cost_saved_usd": 1185386.38,
+      "co2_avoided_mt": 5490.8,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Pure QPSO (Quantum)",
+      "runtime_ms": 157.2,
+      "iterations": 50,
+      "fuel_consumed_mt": 2466.7,
+      "fuel_saved_pct": 40.98,
+      "cost_saved_usd": 1185344.9,
+      "co2_avoided_mt": 5489.8,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Classical GA",
+      "runtime_ms": 370.5,
+      "iterations": 100,
+      "fuel_consumed_mt": 2466.2,
+      "fuel_saved_pct": 40.98,
+      "cost_saved_usd": 1185334.3,
+      "co2_avoided_mt": 5491.2,
+      "cii_grade": "D"
+    },
+    {
+      "algorithm": "Classical PSO",
+      "runtime_ms": 318.3,
+      "iterations": 90,
+      "fuel_consumed_mt": 2633.7,
+      "fuel_saved_pct": 36.98,
+      "cost_saved_usd": 1124488.66,
+      "co2_avoided_mt": 4954.4,
+      "cii_grade": "E"
+    },
+    {
+      "algorithm": "Dijkstra Baseline",
+      "runtime_ms": 0.4,
+      "iterations": 5,
+      "fuel_consumed_mt": 2693.7,
+      "fuel_saved_pct": 35.54,
+      "cost_saved_usd": 1161861.34,
+      "co2_avoided_mt": 4762.0,
+      "cii_grade": "E"
+    }
+  ]
+}

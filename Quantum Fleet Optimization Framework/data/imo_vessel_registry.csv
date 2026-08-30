@@ -1,0 +1,6 @@
+imo_number,vessel_name,vessel_type,flag,dwt_tonnes,displacement_tonnes,length_overall_m,length_pp_m,beam_m,design_draft_m,design_speed_knots,engine_make_model,mcr_power_kw,base_sfoc_g_kwh,admiralty_coefficient_c1,transverse_windage_area_m2,wind_drag_coefficient_cd,wave_drag_coefficient_cw,primary_fuel,dual_fuel_capable,shore_power_installed
+9811001,Oceanic Vanguard,CONTAINER_15000TEU,Singapore,145000,175000,366.0,350.0,51.2,15.5,22.0,MAN B&W 11G95ME-C9.5,58000.0,166.0,0.0042,1400.0,0.9,45.0,GREEN_METHANOL,True,True
+9811002,Pacific Meridian,PANAMAX_BULK,Liberia,74000,89000,225.0,218.0,32.2,14.2,14.5,MAN B&W 6S60ME-C8.5,14000.0,172.0,0.0038,620.0,0.8,38.0,VLSFO,False,False
+9811003,Nordic Horizon,AFRAMAX_TANKER,Marshall Islands,115000,135000,245.0,238.0,42.0,15.0,15.2,WinGD 6X72-B,18000.0,170.0,0.0036,780.0,0.82,40.0,LNG,True,True
+9811004,Indus Star,CAPESIZE_BULK,Panama,178000,210000,290.0,282.0,45.0,18.0,14.8,MAN B&W 6S70ME-C8.5,22000.0,169.0,0.0035,950.0,0.84,41.0,VLSFO,False,True
+9811005,Atlantic Pioneer,VLCC_TANKER,Bahamas,298000,340000,330.0,320.0,60.0,21.0,15.8,WinGD 7X82-B,32000.0,168.0,0.0034,1150.0,0.85,42.0,GREEN_METHANOL,True,True

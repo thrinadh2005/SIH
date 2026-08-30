@@ -1,0 +1,45 @@
+{
+  "dataset_samples": 50000,
+  "train_samples": 40000,
+  "test_samples": 10000,
+  "features": [
+    "vessel_type",
+    "dwt",
+    "displacement",
+    "speed_knots",
+    "draft_ratio",
+    "wave_height_m",
+    "wind_speed_kmh",
+    "wind_angle_deg"
+  ],
+  "models": {
+    "XGBoost_Physics_Informed": {
+      "r2_score": 0.9989,
+      "mape_pct": 1.32,
+      "rmse_mt_day": 2.247,
+      "train_time_sec": 0.648,
+      "artifact_path": "models\\xgboost_physics_informed.joblib"
+    },
+    "Random_Forest_Ensemble": {
+      "r2_score": 0.9989,
+      "mape_pct": 1.3,
+      "rmse_mt_day": 2.181,
+      "train_time_sec": 1.243,
+      "artifact_path": "models\\random_forest_ensemble.joblib"
+    },
+    "Gradient_Boosting_Regressor": {
+      "r2_score": 0.9988,
+      "mape_pct": 1.39,
+      "rmse_mt_day": 2.28,
+      "train_time_sec": 10.261,
+      "artifact_path": "models\\gradient_boosting_regressor.joblib"
+    },
+    "Neural_Surrogate_MLP": {
+      "r2_score": -20.7998,
+      "mape_pct": 251.69,
+      "rmse_mt_day": 311.082,
+      "train_time_sec": 2.027,
+      "artifact_path": "models\\neural_surrogate_mlp.joblib"
+    }
+  }
+}

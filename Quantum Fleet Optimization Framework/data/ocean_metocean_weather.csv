@@ -1,0 +1,28 @@
+lat,lng,corridor,wind_speed_kmh,wind_direction_deg,wave_height_m,temperature_c,source
+8.0,72.0,Laccadive Sea / Arabian Basin,43.5,306.0,2.43,27.0,NOAA_Calibrated
+24.0,36.5,Northern Red Sea,43.7,48.5,2.44,27.0,NOAA_Calibrated
+11.5,60.0,Central Arabian Sea,24.4,30.5,1.14,27.0,NOAA_Calibrated
+1.29,103.85,Singapore Strait,8.6,121.0,0.4,27.8,OpenMeteo_LIVE
+18.0,40.0,Southern Red Sea,6.5,330.0,0.4,32.0,OpenMeteo_LIVE
+5.8,80.5,Sri Lanka Dondra Head,31.2,259.0,1.71,27.5,OpenMeteo_LIVE
+3.15,100.5,Malacca Strait Central,6.0,171.0,0.4,28.6,OpenMeteo_LIVE
+12.6,43.4,Bab-el-Mandeb Strait,6.1,182.0,0.4,32.0,OpenMeteo_LIVE
+29.9,32.55,Suez Canal Transit,31.3,341.0,1.71,30.1,OpenMeteo_LIVE
+37.0,3.0,Western Mediterranean,30.5,279.5,1.53,27.0,NOAA_Calibrated
+27.8,34.3,Gulf of Suez,25.3,315.0,1.29,36.3,OpenMeteo_LIVE
+33.5,28.0,Eastern Mediterranean,37.2,337.0,2.16,26.4,OpenMeteo_LIVE
+36.0,14.5,Malta Channel,3.2,63.0,0.4,30.8,OpenMeteo_LIVE
+35.95,-5.6,Strait of Gibraltar,16.9,61.0,0.75,21.2,OpenMeteo_LIVE
+47.5,-6.2,Bay of Biscay,22.3,257.0,1.08,19.4,OpenMeteo_LIVE
+43.5,-9.5,Cape Finisterre Atlantic,12.8,254.0,0.51,19.3,OpenMeteo_LIVE
+50.5,-0.5,English Channel East,52.6,246.0,3.45,19.4,OpenMeteo_LIVE
+51.95,4.14,Rotterdam Approaches,23.4,175.0,1.16,18.3,OpenMeteo_LIVE
+26.65,50.15,Ras Tanura Terminal,13.8,140.0,0.57,35.8,OpenMeteo_LIVE
+8.1,77.55,Cape Comorin,32.6,144.3,1.67,27.0,NOAA_Calibrated
+26.5,56.4,Strait of Hormuz,10.4,162.0,0.4,33.0,OpenMeteo_LIVE
+15.4,73.8,Goa Coast,6.9,303.0,0.4,23.7,OpenMeteo_LIVE
+23.5,59.8,Gulf of Oman,18.4,174.0,0.84,30.6,OpenMeteo_LIVE
+18.95,72.95,JNPT Mumbai Approaches,16.3,259.0,0.71,27.4,OpenMeteo_LIVE
+31.23,121.5,Shanghai Wusong,6.0,16.0,0.4,27.0,OpenMeteo_LIVE
+24.5,119.8,Taiwan Strait,16.2,172.0,0.7,28.3,OpenMeteo_LIVE
+12.0,112.5,South China Sea,45.5,233.0,2.84,28.9,OpenMeteo_LIVE

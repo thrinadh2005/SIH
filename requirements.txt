@@ -1,0 +1,29 @@
+# ==============================================================================
+# GreenFleet Quantum (SIH-26138) - Python Dependencies Specification
+# Quantum-Inspired Multi-Objective Maritime Decarbonization Framework
+# Smart India Hackathon 2026 — Project SagarQuantum
+# ==============================================================================
+
+# Core Web Framework & Async Server
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.0.0
+websockets>=12.0
+python-multipart>=0.0.9
+
+# Scientific Computing & Data Analysis
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.11.0
+
+# Machine Learning & Hydrodynamic Surrogates
+scikit-learn>=1.4.0
+xgboost>=2.0.0
+joblib>=1.3.0
+
+# HTTP Clients, Network & Testing
+httpx>=0.27.0
+requests>=2.31.0
+
+# Quantum Circuit Simulation & Gate Synthesis (Optional / Free Simulator)
+qiskit>=1.0.0
