@@ -1,55 +1,138 @@
 interface Props {
-  status: string;
-  size?: "sm" | "md";
+  status: string
+  size?: "sm" | "md"
 }
 
-const configs: Record<string, { label: string; bg: string; color: string; dot?: string }> = {
-  normal:       { label: "Normal",     bg: "rgba(16,185,129,0.12)", color: "#10b981", dot: "#10b981" },
-  optimized:    { label: "Optimized",  bg: "rgba(16,185,129,0.12)", color: "#10b981", dot: "#10b981" },
-  "at-risk":    { label: "At Risk",    bg: "rgba(239,68,68,0.12)",  color: "#ef4444", dot: "#ef4444" },
-  "optimization-running": { label: "Optimizing…", bg: "rgba(124,58,237,0.12)", color: "#a78bfa", dot: "#7c3aed" },
-  running:      { label: "Running",    bg: "rgba(124,58,237,0.12)", color: "#a78bfa", dot: "#7c3aed" },
-  active:       { label: "Active",     bg: "rgba(6,182,212,0.12)",  color: "#06b6d4", dot: "#06b6d4" },
-  completed:    { label: "Completed",  bg: "rgba(16,185,129,0.12)", color: "#10b981", dot: "#10b981" },
-  scheduled:    { label: "Scheduled",  bg: "rgba(100,116,139,0.12)",color: "#94a3b8", dot: "#64748b" },
-  stale:        { label: "Stale",      bg: "rgba(245,158,11,0.12)", color: "#f59e0b", dot: "#f59e0b" },
-  offline:      { label: "Offline",    bg: "rgba(100,116,139,0.12)",color: "#64748b", dot: "#64748b" },
-  healthy:      { label: "Healthy",    bg: "rgba(16,185,129,0.12)", color: "#10b981" },
-  degraded:     { label: "Degraded",   bg: "rgba(245,158,11,0.12)", color: "#f59e0b" },
-  warning:      { label: "Warning",    bg: "rgba(245,158,11,0.12)", color: "#f59e0b" },
-  critical:     { label: "Critical",   bg: "rgba(239,68,68,0.12)",  color: "#ef4444" },
-  info:         { label: "Info",       bg: "rgba(6,182,212,0.12)",  color: "#06b6d4" },
-  pass:         { label: "PASS",       bg: "rgba(16,185,129,0.12)", color: "#10b981" },
-  fail:         { label: "FAIL",       bg: "rgba(239,68,68,0.12)",  color: "#ef4444" },
-  A: { label: "A", bg: "rgba(16,185,129,0.15)",  color: "#10b981" },
-  B: { label: "B", bg: "rgba(34,197,94,0.13)",   color: "#16a34a" },
-  C: { label: "C", bg: "rgba(245,158,11,0.13)",  color: "#d97706" },
-  D: { label: "D", bg: "rgba(249,115,22,0.13)",  color: "#ea580c" },
-  E: { label: "E", bg: "rgba(239,68,68,0.15)",   color: "#ef4444" },
-};
+interface BadgeStyle {
+  label: string
+  className: string
+  dotClass?: string
+}
+
+const statusMap: Record<string, BadgeStyle> = {
+  normal: {
+    label: "Normal",
+    className: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30",
+    dotClass: "bg-emerald-500",
+  },
+  optimized: {
+    label: "Optimized",
+    className: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30",
+    dotClass: "bg-emerald-500",
+  },
+  "at-risk": {
+    label: "At Risk",
+    className: "bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30",
+    dotClass: "bg-rose-500",
+  },
+  "optimization-running": {
+    label: "Optimizing…",
+    className: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30",
+    dotClass: "bg-purple-500",
+  },
+  running: {
+    label: "Running",
+    className: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30",
+    dotClass: "bg-purple-500",
+  },
+  active: {
+    label: "Active",
+    className: "bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30",
+    dotClass: "bg-sky-500",
+  },
+  completed: {
+    label: "Completed",
+    className: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30",
+    dotClass: "bg-emerald-500",
+  },
+  scheduled: {
+    label: "Scheduled",
+    className: "bg-slate-500/15 text-slate-600 dark:text-slate-300 border border-slate-500/30",
+    dotClass: "bg-slate-400",
+  },
+  stale: {
+    label: "Stale",
+    className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30",
+    dotClass: "bg-amber-500",
+  },
+  offline: {
+    label: "Offline",
+    className: "bg-slate-500/15 text-slate-600 dark:text-slate-400 border border-slate-500/30",
+    dotClass: "bg-slate-400",
+  },
+  healthy: {
+    label: "Healthy",
+    className: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30",
+    dotClass: "bg-emerald-500",
+  },
+  degraded: {
+    label: "Degraded",
+    className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30",
+    dotClass: "bg-amber-500",
+  },
+  warning: {
+    label: "Warning",
+    className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30",
+    dotClass: "bg-amber-500",
+  },
+  critical: {
+    label: "Critical",
+    className: "bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30",
+    dotClass: "bg-rose-500",
+  },
+  info: {
+    label: "Info",
+    className: "bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30",
+    dotClass: "bg-sky-500",
+  },
+  pass: {
+    label: "PASS",
+    className: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30",
+    dotClass: "bg-emerald-500",
+  },
+  fail: {
+    label: "FAIL",
+    className: "bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30",
+    dotClass: "bg-rose-500",
+  },
+}
 
 export default function StatusBadge({ status, size = "md" }: Props) {
-  const cfg = configs[status] || { label: status, bg: "rgba(100,116,139,0.12)", color: "#94a3b8" };
-  const pad = size === "sm" ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-1 text-xs";
+  const cfg = statusMap[status] || {
+    label: status,
+    className: "bg-slate-500/15 text-slate-600 dark:text-slate-300 border border-slate-500/30",
+    dotClass: "bg-slate-400",
+  }
+  const pad = size === "sm" ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-1 text-xs"
+
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded font-mono font-semibold uppercase tracking-wide ${pad}`}
-      style={{ background: cfg.bg, color: cfg.color }}
+      className={`inline-flex items-center gap-1.5 rounded font-mono font-bold uppercase tracking-wider ${cfg.className} ${pad}`}
     >
-      {cfg.dot && <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: cfg.dot }} />}
+      {cfg.dotClass && (
+        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dotClass}`} />
+      )}
       {cfg.label}
     </span>
-  );
+  )
+}
+
+const ciiGradeStyles: Record<string, string> = {
+  A: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/40",
+  B: "bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-500/40",
+  C: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/40",
+  D: "bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/40",
+  E: "bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/40",
 }
 
 export function CIIBadge({ grade }: { grade: string }) {
-  const cfg = configs[grade] || configs.C;
+  const style = ciiGradeStyles[grade] || ciiGradeStyles.C
+
   return (
     <span
-      className="inline-flex items-center justify-center w-8 h-8 rounded-lg font-display font-bold text-base"
-      style={{ background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.color}35` }}
+      className={`inline-flex items-center justify-center w-8 h-8 rounded-lg font-display font-bold text-base border shadow-xs ${style}`}
     >
       {grade}
     </span>
-  );
+  )
 }

@@ -25,6 +25,7 @@ import asyncio
 import json
 import random
 import time
+import math
 import urllib.request
 from contextlib import asynccontextmanager
 from typing import List, Dict, Any, Optional
@@ -65,7 +66,10 @@ from backend.database import (
     db_get_vessel,
     db_update_vessel_telemetry,
     db_save_voyage,
-    db_save_certificate
+    db_save_certificate,
+    db_get_fleet_aggregate_metrics,
+    db_get_recent_voyages,
+    db_get_recent_certificates
 )
 
 from core.ibm_quantum_service import RealQuantumCircuitService
@@ -243,27 +247,33 @@ def get_services_status():
 
 @app.get("/api/v1/overview")
 def get_fleet_overview():
-    vessels = db_get_all_vessels()
-    total_dwt = sum(v["dwt"] for v in vessels)
-    avg_speed = sum(v["speed"] for v in vessels) / max(1, len(vessels))
-    grade_counts = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0}
-    for v in vessels:
-        g = v.get("cii_grade", "C")
-        grade_counts[g] = grade_counts.get(g, 0) + 1
+    return db_get_fleet_aggregate_metrics()
 
-    return {
-        "total_vessels": len(vessels),
-        "total_dwt": total_dwt,
-        "active_voyages": len(vessels),
-        "fleet_mean_speed": round(avg_speed, 1),
-        "fuel_saved_ytd_pct": 14.85,
-        "co2_avoided_ytd_mt": 18450.0,
-        "cost_saved_ytd_usd": 2480000.0,
-        "cii_distribution": grade_counts,
-        "cii_compliance_rate_pct": 100.0,
-        "quantum_jobs_completed": 1584,
-        "active_alerts_count": 1
-    }
+
+@app.get("/api/v1/benchmarks/tournament")
+def get_benchmark_tournament(corridor_id: str = Query("SIN_ROT")):
+    """Returns official head-to-head algorithm tournament results across 5 algorithms."""
+    tourn_path = os.path.join(os.path.dirname(__file__), "..", "models", "benchmark_tournament_results.json")
+    if os.path.exists(tourn_path):
+        try:
+            with open(tourn_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return {"corridor_id": corridor_id, "results": data.get(corridor_id, data.get("SIN_ROT", []))}
+        except Exception:
+            pass
+    return {"corridor_id": corridor_id, "results": []}
+
+
+@app.get("/api/v1/voyages/recent")
+def get_recent_voyages_list(limit: int = Query(10)):
+    """Returns recent optimized voyages saved in SQLite."""
+    return db_get_recent_voyages(limit)
+
+
+@app.get("/api/v1/certificates/recent")
+def get_recent_certificates_list(limit: int = Query(10)):
+    """Returns recent cryptographically signed audit certificates saved in SQLite."""
+    return db_get_recent_certificates(limit)
 
 
 @app.get("/api/v1/fleet")
@@ -365,12 +375,15 @@ def get_corridor_currents(corridor_id: str = Query("SIN_ROT")):
 # 1. 🛰️ MARITIME IOT, NMEA EDGE GATEWAY & SATELLITE AIS
 # ─────────────────────────────────────────────────────────────────────────────
 
+@app.get("/api/v1/edge/status")
 @app.get("/api/v1/edge/telemetry")
 def get_live_edge_telemetry():
     """Generates and parses real-time NMEA serial strings ($GPGGA, $VHW, $RPM, $TRQ)."""
     raw_sentences = edge_gateway.generate_simulated_nmea_feed()
     parsed = edge_gateway.process_raw_stream(raw_sentences)
     parsed["raw_nmea_sentences"] = raw_sentences
+    parsed["status"] = "online"
+    parsed["gateway_uptime_seconds"] = int(time.time() % 86400)
     return parsed
 
 
@@ -505,26 +518,50 @@ def get_eu_ets_wallet(co2_mt: float = Query(4310.2)):
 # 5. 💰 COMMERCIAL FLEET ECONOMICS: BUNKER ARBITRAGE & RETROFIT ROI
 # ─────────────────────────────────────────────────────────────────────────────
 
+@app.get("/api/v1/commercial/bunker-arbitrage")
 @app.post("/api/v1/commercial/bunker-arbitrage")
-def calculate_bunker_arbitrage(req: BunkerArbitrageRequest):
+def calculate_bunker_arbitrage(
+    req: Optional[BunkerArbitrageRequest] = Body(None),
+    corridor_id: str = Query("SIN_ROT"),
+    fuel_type: str = Query("GREEN_METHANOL"),
+    required_fuel_mt: float = Query(1200.0),
+    tank_capacity_mt: float = Query(2000.0),
+    current_tank_level_mt: float = Query(350.0)
+):
     """Solves dynamic bunkering price arbitrage across global hubs."""
+    c_id = req.corridor_id if req else corridor_id
+    f_type = req.fuel_type if req else fuel_type
+    r_fuel = req.required_fuel_mt if req else required_fuel_mt
+    t_cap = req.tank_capacity_mt if req else tank_capacity_mt
+    c_lvl = req.current_tank_level_mt if req else current_tank_level_mt
     return bunkering_solver.solve_bunkering_plan(
-        corridor_id=req.corridor_id,
-        fuel_type=req.fuel_type,
-        required_fuel_mt=req.required_fuel_mt,
-        tank_capacity_mt=req.tank_capacity_mt,
-        current_tank_level_mt=req.current_tank_level_mt
+        corridor_id=c_id,
+        fuel_type=f_type,
+        required_fuel_mt=r_fuel,
+        tank_capacity_mt=t_cap,
+        current_tank_level_mt=c_lvl
     )
 
 
+@app.get("/api/v1/commercial/retrofit-roi")
 @app.post("/api/v1/commercial/retrofit-roi")
-def calculate_retrofit_roi(req: RetrofitROIRequest):
+def calculate_retrofit_roi(
+    req: Optional[RetrofitROIRequest] = Body(None),
+    vessel_dwt: float = Query(145000.0),
+    carbon_tax_eur_tonne: float = Query(82.50),
+    discount_rate_wacc: float = Query(0.08),
+    custom_capex_adjust_pct: float = Query(0.0)
+):
     """Calculates 15-year DCF, NPV, IRR, and payback period for Dual-Fuel & Wing Sail retrofits."""
+    dwt = req.vessel_dwt if req else vessel_dwt
+    tax = req.carbon_tax_eur_tonne if req else carbon_tax_eur_tonne
+    wacc = req.discount_rate_wacc if req else discount_rate_wacc
+    adj = req.custom_capex_adjust_pct if req else custom_capex_adjust_pct
     return retrofit_simulator.evaluate_retrofit_options(
-        vessel_dwt=req.vessel_dwt,
-        carbon_tax_eur_tonne=req.carbon_tax_eur_tonne,
-        discount_rate_wacc=req.discount_rate_wacc,
-        custom_capex_adjust_pct=req.custom_capex_adjust_pct
+        vessel_dwt=dwt,
+        carbon_tax_eur_tonne=tax,
+        discount_rate_wacc=wacc,
+        custom_capex_adjust_pct=adj
     )
 
 
@@ -575,37 +612,40 @@ def get_reports_and_audit():
 
 
 @app.post("/api/v1/optimize/voyage")
-def optimize_voyage(req: OptimizeVoyageRequest):
+async def optimize_voyage(req: OptimizeVoyageRequest):
     corridor = GLOBAL_CORRIDORS.get(req.corridor_id, GLOBAL_CORRIDORS["SIN_ROT"])
     waypoints = corridor["waypoints"]
     n_legs = len(waypoints) - 1
     bounds = [(req.min_speed_knots, req.max_speed_knots) for _ in range(n_legs)]
 
-    def cost_fn(speeds):
-        res = evaluate_voyage_cost(
-            speeds_knots=speeds,
-            corridor=corridor,
-            vessel_type=req.vessel_type,
-            fuel_type=req.fuel_type,
-            arrival_penalty_per_hour=req.arrival_penalty_rate
-        )
-        return res["total_cost_usd"]
+    def _run_optimization_sync():
+        def cost_fn(speeds):
+            res = evaluate_voyage_cost(
+                speeds_knots=speeds,
+                corridor=corridor,
+                vessel_type=req.vessel_type,
+                fuel_type=req.fuel_type,
+                arrival_penalty_per_hour=req.arrival_penalty_rate
+            )
+            return res["total_cost_usd"]
 
-    algo_key = req.algorithm.upper()
-    if algo_key in ["HYBRID_HQOA", "HYBRID"]:
-        solver = HybridQuantumOptimizer(qga_iter=15, qpso_iter=30, n_particles=30)
-    elif algo_key in ["QPSO", "QUANTUM_PSO"]:
-        solver = QuantumParticleSwarmOptimizer(n_particles=35, max_iter=50)
-    elif algo_key in ["QGA", "QUANTUM_GA"]:
-        solver = QuantumGeneticAlgorithm(pop_size=30, max_iter=60)
-    elif algo_key in ["CLASSICAL_PSO", "PSO"]:
-        solver = ClassicalPSO(n_particles=40, max_iter=100)
-    elif algo_key in ["CLASSICAL_GA", "GA"]:
-        solver = ClassicalGA(pop_size=40, max_iter=120)
-    else:
-        solver = DijkstraSpeedOptimizer(speed_levels=6)
+        algo_key = req.algorithm.upper()
+        if algo_key in ["HYBRID_HQOA", "HYBRID"]:
+            solver = HybridQuantumOptimizer(qga_iter=15, qpso_iter=30, n_particles=30)
+        elif algo_key in ["QPSO", "QUANTUM_PSO"]:
+            solver = QuantumParticleSwarmOptimizer(n_particles=35, max_iter=50)
+        elif algo_key in ["QGA", "QUANTUM_GA"]:
+            solver = QuantumGeneticAlgorithm(pop_size=30, max_iter=60)
+        elif algo_key in ["CLASSICAL_PSO", "PSO"]:
+            solver = ClassicalPSO(n_particles=40, max_iter=100)
+        elif algo_key in ["CLASSICAL_GA", "GA"]:
+            solver = ClassicalGA(pop_size=40, max_iter=120)
+        else:
+            solver = DijkstraSpeedOptimizer(speed_levels=6)
 
-    opt_res = solver.optimize(cost_fn, bounds)
+        return solver.optimize(cost_fn, bounds)
+
+    opt_res = await asyncio.to_thread(_run_optimization_sync)
     best_speeds = opt_res["optimal_solution"]
 
     voyage_details = evaluate_voyage_cost(
@@ -762,6 +802,53 @@ def generate_certificate_json(data: Dict[str, Any] = Body(...)):
 # WEBSOCKET REAL-TIME STREAMING WITH SQLITE PERSISTENCE
 # ─────────────────────────────────────────────────────────────────────────────
 
+def compute_corridor_kinematics(corridor_id: str, progress: float, speed_knots: float, vessel_type_key: str, fuel_type: str) -> Dict[str, Any]:
+    corridor = GLOBAL_CORRIDORS.get(corridor_id, GLOBAL_CORRIDORS["SIN_ROT"])
+    waypoints = corridor["waypoints"]
+    n_legs = max(1, len(waypoints) - 1)
+    
+    clamped_prog = max(0.01, min(0.99, progress))
+    exact_pos = clamped_prog * n_legs
+    leg_idx = min(n_legs - 1, int(exact_pos))
+    frac = exact_pos - leg_idx
+    
+    wp1 = waypoints[leg_idx]
+    wp2 = waypoints[min(n_legs, leg_idx + 1)]
+    
+    lat = wp1["lat"] + frac * (wp2["lat"] - wp1["lat"])
+    lng = wp1["lng"] + frac * (wp2["lng"] - wp1["lng"])
+    
+    # Accurate Great-Circle Bearing
+    d_lng = math.radians(wp2["lng"] - wp1["lng"])
+    lat1_r = math.radians(wp1["lat"])
+    lat2_r = math.radians(wp2["lat"])
+    y = math.sin(d_lng) * math.cos(lat2_r)
+    x = math.cos(lat1_r) * math.sin(lat2_r) - math.sin(lat1_r) * math.cos(lat2_r) * math.cos(d_lng)
+    bearing = round((math.degrees(math.atan2(y, x)) + 360) % 360, 1)
+    
+    # Real-time Hydrodynamics & SFOC Calculation
+    hydro = HydrodynamicModel(vessel_type=vessel_type_key)
+    wave_m = wp1.get("avg_wave_m", 1.5)
+    wind_kmh = wp1.get("wind_kmh", 20.0)
+    pwr_dict = hydro.calculate_total_power(speed_knots, wave_height_m=wave_m, wind_speed_kmh=wind_kmh)
+    sfoc = hydro.get_sfoc(pwr_dict["engine_load_pct"], fuel_type)
+    fuel_rate = round((pwr_dict["total_power_kw"] * sfoc * 24.0) / 1e6, 2)
+    
+    # Attained CII Calculation
+    cii_res = hydro.calculate_cii_score(total_fuel_mt=fuel_rate * 15.0, total_distance_nm=corridor["distance_nm"], fuel_type=fuel_type)
+    
+    return {
+        "lat": round(lat, 4),
+        "lng": round(lng, 4),
+        "heading": bearing,
+        "power_kw": pwr_dict["total_power_kw"],
+        "engine_load_pct": pwr_dict["engine_load_pct"],
+        "fuel_rate_mt_day": fuel_rate,
+        "attained_cii": cii_res["attained_cii"],
+        "cii_grade": cii_res["grade"]
+    }
+
+
 @app.websocket("/ws/ais/live")
 async def websocket_ais_live(websocket: WebSocket):
     await websocket.accept()
@@ -781,12 +868,34 @@ async def websocket_ais_live(websocket: WebSocket):
             await asyncio.sleep(3.0)
             vessels = db_get_all_vessels()
             for v in vessels:
-                new_prog = min(0.99, v["progress"] + 0.0006 + random.uniform(0, 0.0002))
-                new_speed = round(max(9.0, min(22.0, v["speed"] + random.uniform(-0.15, 0.15))), 1)
-                new_lat = v["lat"] + random.uniform(-0.005, 0.005)
-                new_lng = v["lng"] + random.uniform(-0.005, 0.005)
+                # Advance progress realistically along corridor
+                new_prog = v["progress"] + 0.0008 + random.uniform(0, 0.0002)
+                if new_prog >= 0.99:
+                    new_prog = 0.02
+                    
+                new_speed = round(max(9.0, min(22.0, v["speed"] + random.uniform(-0.1, 0.1))), 1)
+                
+                kin = compute_corridor_kinematics(
+                    corridor_id=v.get("corridor", "SIN_ROT"),
+                    progress=new_prog,
+                    speed_knots=new_speed,
+                    vessel_type_key=v.get("vessel_type_key", "CONTAINER_15000TEU"),
+                    fuel_type=v.get("fuel_type", "VLSFO")
+                )
 
-                db_update_vessel_telemetry(v["id"], new_lat, new_lng, new_speed, v["heading"], new_prog)
+                db_update_vessel_telemetry(
+                    vessel_id=v["id"],
+                    lat=kin["lat"],
+                    lng=kin["lng"],
+                    speed=new_speed,
+                    heading=kin["heading"],
+                    progress=round(new_prog, 4),
+                    power_kw=kin["power_kw"],
+                    fuel_rate_mt_day=kin["fuel_rate_mt_day"],
+                    engine_load_pct=kin["engine_load_pct"],
+                    attained_cii=kin["attained_cii"],
+                    cii_grade=kin["cii_grade"]
+                )
 
                 await websocket.send_json({
                     "type": "VESSEL_UPDATE",
@@ -798,12 +907,14 @@ async def websocket_ais_live(websocket: WebSocket):
                         "speed": new_speed,
                         "progress": round(new_prog, 4),
                         "status": v["status"],
-                        "heading": v["heading"],
-                        "lat": new_lat,
-                        "lng": new_lng,
-                        "fuel_rate_mt_day": v["fuel_rate_mt_day"],
-                        "attained_cii": v["attained_cii"],
-                        "cii_grade": v["cii_grade"],
+                        "heading": kin["heading"],
+                        "lat": kin["lat"],
+                        "lng": kin["lng"],
+                        "fuel_rate_mt_day": kin["fuel_rate_mt_day"],
+                        "power_kw": kin["power_kw"],
+                        "engine_load_pct": kin["engine_load_pct"],
+                        "attained_cii": kin["attained_cii"],
+                        "cii_grade": kin["cii_grade"],
                         "timestamp": int(time.time() * 1000)
                     }
                 })

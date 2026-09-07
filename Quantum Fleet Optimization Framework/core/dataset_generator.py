@@ -96,6 +96,7 @@ def evaluate_voyage_cost(speeds_knots: List[float], corridor: Dict[str, Any],
 
     for i in range(n_legs):
         wp = waypoints[i]
+        next_wp = waypoints[i + 1] if (i + 1) < len(waypoints) else {"name": "Destination"}
         dist = wp["distance_to_next"]
         speed = speeds_knots[i] if i < len(speeds_knots) else 15.0
         wave_h = wp.get("avg_wave_m", 1.5)
@@ -108,6 +109,13 @@ def evaluate_voyage_cost(speeds_knots: List[float], corridor: Dict[str, Any],
             wind_speed_kmh=wind_k,
             fuel_type=fuel_type
         )
+
+        leg_res["leg_index"] = i + 1
+        leg_res["from_name"] = wp.get("name", f"Waypoint #{i+1}")
+        leg_res["to_name"] = next_wp.get("name", f"Waypoint #{i+2}")
+        leg_res["power_kw"] = leg_res.get("power", {}).get("total_power_kw", 14500)
+        leg_res["wave_height_m"] = wave_h
+        leg_res["wind_speed_kmh"] = wind_k
 
         total_distance_nm += dist
         total_hours += leg_res["hours"]

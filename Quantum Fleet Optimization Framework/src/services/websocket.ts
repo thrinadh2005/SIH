@@ -5,110 +5,129 @@
  * with automated reconnection, latency tracking, and event emission.
  */
 
-type Handler<T> = (data: T) => void;
+type Handler<T> = (data: T) => void
 
 class MaritimeWebSocket {
-  private ws: WebSocket | null = null;
-  private handlers = new Map<string, Set<Handler<unknown>>>();
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-  private isConnected = false;
-  private fallbackTimer: ReturnType<typeof setInterval> | null = null;
+  private ws: WebSocket | null = null
+  private handlers = new Map<string, Set<Handler<unknown>>>()
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  private isConnected = false
+  private fallbackTimer: ReturnType<typeof setInterval> | null = null
 
   connect() {
-    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
-      return;
+    if (
+      this.ws &&
+      (this.ws.readyState === WebSocket.OPEN ||
+        this.ws.readyState === WebSocket.CONNECTING)
+    ) {
+      return
     }
 
     try {
-      const wsUrl = "ws://localhost:8000/ws/ais/live";
-      this.ws = new WebSocket(wsUrl);
+      const wsUrl = "ws://localhost:8000/ws/ais/live"
+      this.ws = new WebSocket(wsUrl)
 
       this.ws.onopen = () => {
-        this.isConnected = true;
+        this.isConnected = true
         if (this.fallbackTimer) {
-          clearInterval(this.fallbackTimer);
-          this.fallbackTimer = null;
+          clearInterval(this.fallbackTimer)
+          this.fallbackTimer = null
         }
-        this.emit("CONNECTION", { status: "connected", latency: 18 });
-      };
+        this.emit("CONNECTION", { status: "connected", latency: 18 })
+      }
 
       this.ws.onmessage = (event) => {
         try {
-          const { type, payload } = JSON.parse(event.data);
-          this.emit(type, payload);
+          const { type, payload } = JSON.parse(event.data)
+          this.emit(type, payload)
         } catch {}
-      };
+      }
 
       this.ws.onclose = () => {
-        this.isConnected = false;
-        this.emit("CONNECTION", { status: "reconnecting" });
-        this.scheduleReconnect();
-      };
+        this.isConnected = false
+        this.emit("CONNECTION", { status: "reconnecting" })
+        this.scheduleReconnect()
+      }
 
       this.ws.onerror = () => {
-        this.ws?.close();
-      };
+        this.ws?.close()
+      }
     } catch {
-      this.scheduleReconnect();
+      this.scheduleReconnect()
     }
   }
 
   private scheduleReconnect() {
-    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer)
 
-    // Run fallback local ticker while backend is starting
     if (!this.fallbackTimer) {
-      this.startLocalTicker();
+      this.startDynamicTicker()
     }
 
     this.reconnectTimer = setTimeout(() => {
-      this.connect();
-    }, 4000);
+      this.connect()
+    }, 3000)
   }
 
-  private startLocalTicker() {
-    const vessels = [
-      { id: "V001", mmsi: "311009001", name: "Oceanic Vanguard", lat: 12.60, lng: 43.40, speed: 16.4, progress: 0.42, status: "optimized" },
-      { id: "V002", mmsi: "311009002", name: "Pacific Meridian", lat: 8.00, lng: 83.00, speed: 13.8, progress: 0.68, status: "at-risk" },
-      { id: "V003", mmsi: "311009003", name: "Nordic Horizon", lat: 23.50, lng: 59.80, speed: 14.5, progress: 0.22, status: "normal" },
-      { id: "V004", mmsi: "311009004", name: "Indus Star", lat: 35.80, lng: 14.50, speed: 12.8, progress: 0.81, status: "optimization-running" },
-      { id: "V005", mmsi: "311009005", name: "Atlantic Pioneer", lat: 35.95, lng: -5.60, speed: 15.0, progress: 0.53, status: "normal" }
-    ];
-
-    this.fallbackTimer = setInterval(() => {
-      vessels.forEach((v) => {
-        v.progress = Math.min(0.99, v.progress + 0.0006);
-        v.lat += (Math.random() - 0.5) * 0.005;
-        v.lng += (Math.random() - 0.5) * 0.005;
-        this.emit("VESSEL_UPDATE", {
-          ...v,
-          heading: 280,
-          timestamp: Date.now()
-        });
-      });
-    }, 3000);
-  }
-
-  on<T>(event: string, handler: Handler<T>) {
-    if (!this.handlers.has(event)) {
-      this.handlers.set(event, new Set());
+  private startDynamicTicker() {
+    // Dynamically poll backend fleet API when WebSocket is establishing
+    const pollBackendFleet = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/v1/fleet", {
+          signal: AbortSignal.timeout(2500),
+        })
+        if (res.ok) {
+          const fleet = await res.json()
+          if (Array.isArray(fleet)) {
+            fleet.forEach((v) => {
+              this.emit("VESSEL_UPDATE", {
+                ...v,
+                timestamp: Date.now(),
+              })
+            })
+          }
+        }
+      } catch {
+        // Backend connecting
+      }
     }
-    this.handlers.get(event)!.add(handler as Handler<unknown>);
+
+    pollBackendFleet()
+    this.fallbackTimer = setInterval(pollBackendFleet, 3000)
+  }
+
+  on<T,>(event: string, handler: Handler<T>) {
+    if (!this.handlers.has(event)) {
+      this.handlers.set(event, new Set())
+    }
+    this.handlers.get(event)!.add(handler as Handler<unknown>)
     return () => {
-      this.handlers.get(event)?.delete(handler as Handler<unknown>);
-    };
+      this.handlers.get(event)?.delete(handler as Handler<unknown>)
+    }
+  }
+
+  subscribe(callback: (msg: { type: string; payload: any }) => void) {
+    this.connect()
+    const offConn = this.on<any>("CONNECTION", (payload) => callback({ type: "CONNECTION", payload }))
+    const offVessel = this.on<any>("VESSEL_UPDATE", (payload) => callback({ type: "VESSEL_UPDATE", payload }))
+    const offAlert = this.on<any>("ALERT", (payload) => callback({ type: "ALERT", payload }))
+    return () => {
+      offConn()
+      offVessel()
+      offAlert()
+    }
   }
 
   private emit(event: string, data: unknown) {
-    this.handlers.get(event)?.forEach((h) => h(data));
+    this.handlers.get(event)?.forEach((h) => h(data))
   }
 
   disconnect() {
-    if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
-    if (this.fallbackTimer) clearInterval(this.fallbackTimer);
-    if (this.ws) this.ws.close();
-    this.isConnected = false;
+    if (this.reconnectTimer) clearTimeout(this.reconnectTimer)
+    if (this.fallbackTimer) clearInterval(this.fallbackTimer)
+    if (this.ws) this.ws.close()
+    this.isConnected = false
   }
 }
 
-export const wsClient = new MaritimeWebSocket();
+export const wsClient = new MaritimeWebSocket()

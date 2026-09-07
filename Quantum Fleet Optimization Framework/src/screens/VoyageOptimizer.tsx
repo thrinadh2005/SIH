@@ -1,392 +1,705 @@
-import { useState, useEffect } from "react";
-import { Check, ChevronRight, ChevronLeft, AlertCircle, Zap, RefreshCw } from "lucide-react";
-import { fetchCorridors, fetchFleetList, fetchFuels, ShippingCorridor, FuelPathway } from "../services/api";
+import { useState, useEffect } from "react"
+import {
+  Check,
+  ChevronRight,
+  Navigation,
+  Ship,
+  Fuel,
+  Zap,
+  RefreshCw,
+  Layers,
+  ShieldCheck,
+  MapPin,
+  Sliders,
+  ArrowRight,
+  Compass,
+  Wind,
+  Clock,
+  Award,
+  DollarSign,
+  Waves
+} from "lucide-react"
+import {
+  fetchCorridors,
+  fetchFleetList,
+  fetchFuels,
+  ShippingCorridor,
+  FuelPathway,
+} from "../services/api"
 
 interface Props {
-  onNavigate: (id: string) => void;
+  onNavigate: (id: string) => void
 }
 
-const steps = [
-  { id: 1, label: "Route" },
-  { id: 2, label: "Vessel" },
-  { id: 3, label: "Arrival" },
-  { id: 4, label: "Environment" },
-  { id: 5, label: "Objectives" },
-  { id: 6, label: "Fuel" },
-  { id: 7, label: "Algorithm" },
-  { id: 8, label: "Review" },
-];
+interface PlanTemplate {
+  id: string
+  name: string
+  code: string
+  badge: string
+  color: string
+  algorithm: string
+  fuelType: string
+  fuelWeight: number
+  carbonWeight: number
+  delayWeight: number
+  minSpeed: number
+  maxSpeed: number
+  description: string
+  highlights: string
+}
 
-export default function VoyageOptimizer({ onNavigate }: Props) {
-  const [step, setStep] = useState(1);
-  const [corridors, setCorridors] = useState<ShippingCorridor[]>([]);
-  const [fleet, setFleet] = useState<any[]>([]);
-  const [fuels, setFuels] = useState<FuelPathway[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [form, setForm] = useState({
-    corridorId: "SIN_ROT",
-    origin: "Singapore",
-    destination: "Rotterdam",
-    distance: 8280,
-    vesselId: "V001",
-    vesselName: "Oceanic Vanguard",
-    vesselType: "CONTAINER_15000TEU",
-    fuel: "green_methanol",
+const PLAN_PRESETS: PlanTemplate[] = [
+  {
+    id: "plan-alpha",
+    name: "Plan Alpha · Quantum HQOA",
+    code: "HQOA-156Q",
+    badge: "GLOBAL OPTIMUM",
+    color: "#10b981",
+    algorithm: "hybrid_hqoa",
+    fuelType: "green_methanol",
     fuelWeight: 0.45,
     carbonWeight: 0.35,
     delayWeight: 0.20,
-    shorePower: true,
+    minSpeed: 12.0,
+    maxSpeed: 18.5,
+    description: "Multi-qubit Hamiltonian Pareto optimal leveraging Copernicus ocean current meander capture.",
+    highlights: "−16.8% Fuel · IMO Grade A · 156Q ZNE"
+  },
+  {
+    id: "plan-beta",
+    name: "Plan Beta · Quantum QPSO",
+    code: "QPSO-SWARM",
+    badge: "WEATHER & SAFETY",
+    color: "#0284c7",
+    algorithm: "quantum_pso",
+    fuelType: "lng",
+    fuelWeight: 0.35,
+    carbonWeight: 0.25,
+    delayWeight: 0.40,
+    minSpeed: 10.5,
+    maxSpeed: 16.5,
+    description: "Dynamic wave swell avoidance minimizing hull fatigue and severe sea state resistance.",
+    highlights: "Hs < 2.5m · Hull Fatigue −34% · Safe Pass"
+  },
+  {
+    id: "plan-gamma",
+    name: "Plan Gamma · Quantum QGA",
+    code: "QGA-JIT",
+    badge: "JIT SCHEDULE",
+    color: "#a855f7",
+    algorithm: "quantum_ga",
+    fuelType: "vlsfo",
+    fuelWeight: 0.30,
+    carbonWeight: 0.20,
+    delayWeight: 0.50,
+    minSpeed: 14.0,
+    maxSpeed: 21.0,
+    description: "Strict port arrival window lock minimizing costly demurrage and canal queueing.",
+    highlights: "Zero Demurrage · JIT Window · +1.4kn"
+  },
+  {
+    id: "plan-delta",
+    name: "Plan Delta · IMO DCS Class-A",
+    code: "IMO-DECARB",
+    badge: "ULTRA ECO",
+    color: "#06b6d4",
     algorithm: "hybrid_hqoa",
-    particles: "40",
-    iterations: "60",
-    runBaseline: true,
-  });
+    fuelType: "bio_methanol",
+    fuelWeight: 0.20,
+    carbonWeight: 0.70,
+    delayWeight: 0.10,
+    minSpeed: 11.5,
+    maxSpeed: 16.0,
+    description: "Well-to-Wake zero carbon strategy maximizing IMO CII score and eliminating EU ETS taxes.",
+    highlights: "IMO Grade A+ · ETS €0 · CO₂ −68%"
+  },
+  {
+    id: "plan-epsilon",
+    name: "Plan Epsilon · Classical Baseline",
+    code: "BASE-REF",
+    badge: "BENCHMARK REF",
+    color: "#64748b",
+    algorithm: "classical_baseline",
+    fuelType: "vlsfo",
+    fuelWeight: 0.50,
+    carbonWeight: 0.10,
+    delayWeight: 0.40,
+    minSpeed: 15.0,
+    maxSpeed: 16.0,
+    description: "Traditional constant RPM navigation along unoptimized Great Circle lane.",
+    highlights: "Fixed RPM · Ref 0% · Great Circle"
+  }
+]
+
+export default function VoyageOptimizer({ onNavigate }: Props) {
+  const [corridors, setCorridors] = useState<ShippingCorridor[]>([])
+  const [fleet, setFleet] = useState<any[]>([])
+  const [fuels, setFuels] = useState<FuelPathway[]>([])
+  const [loading, setLoading] = useState(true)
+
+  // Active Plan Preset
+  const [activePreset, setActivePreset] = useState<string>("plan-alpha")
+
+  // Planning Form State
+  const [corridorId, setCorridorId] = useState("SIN_ROT")
+  const [vesselId, setVesselId] = useState("V001")
+  const [vesselType, setVesselType] = useState("CONTAINER_15000TEU")
+  const [fuelType, setFuelType] = useState("green_methanol")
+  const [algorithm, setAlgorithm] = useState("hybrid_hqoa")
+
+  // Objective Weights
+  const [fuelWeight, setFuelWeight] = useState(0.45)
+  const [carbonWeight, setCarbonWeight] = useState(0.35)
+  const [delayWeight, setDelayWeight] = useState(0.20)
+
+  // Operational Constraints
+  const [minSpeed, setMinSpeed] = useState(12.0)
+  const [maxSpeed, setMaxSpeed] = useState(18.5)
+  const [shorePower, setShorePower] = useState(true)
+  const [weatherRouting, setWeatherRouting] = useState(true)
 
   useEffect(() => {
     Promise.all([fetchCorridors(), fetchFleetList(), fetchFuels()])
       .then(([corrs, flt, fls]) => {
-        setCorridors(corrs);
-        setFleet(flt);
-        setFuels(fls);
-        if (corrs.length > 0) {
-          setForm((f) => ({
-            ...f,
-            corridorId: corrs[0].id,
-            origin: corrs[0].origin,
-            destination: corrs[0].destination,
-            distance: corrs[0].distance_nm,
-          }));
-        }
+        setCorridors(corrs)
+        setFleet(flt)
+        setFuels(fls)
+        if (corrs.length > 0) setCorridorId(corrs[0].id)
         if (flt.length > 0) {
-          setForm((f) => ({
-            ...f,
-            vesselId: flt[0].id,
-            vesselName: flt[0].name,
-            vesselType: flt[0].vessel_type_key || "CONTAINER_15000TEU",
-          }));
+          setVesselId(flt[0].id)
+          setVesselType(flt[0].vessel_type_key || "CONTAINER_15000TEU")
         }
-        setLoading(false);
+        setLoading(false)
       })
-      .catch(() => setLoading(false));
-  }, []);
+      .catch(() => setLoading(false))
+  }, [])
 
-  const set = (k: string, v: string | boolean | number) => setForm((f) => ({ ...f, [k]: v }));
-  const totalWeight = form.fuelWeight + form.carbonWeight + form.delayWeight;
-  const weightOk = Math.abs(totalWeight - 1) < 0.01;
+  const selectedCorridor =
+    corridors.find((c) => c.id === corridorId) || corridors[0]
+  const selectedFuel = fuels.find((f) => f.id === fuelType) || fuels[0]
+
+  const applyPreset = (preset: PlanTemplate) => {
+    setActivePreset(preset.id)
+    setAlgorithm(preset.algorithm)
+    setFuelType(preset.fuelType)
+    setFuelWeight(preset.fuelWeight)
+    setCarbonWeight(preset.carbonWeight)
+    setDelayWeight(preset.delayWeight)
+    setMinSpeed(preset.minSpeed)
+    setMaxSpeed(preset.maxSpeed)
+  }
+
+  const handleLaunch = () => {
+    onNavigate("console")
+  }
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center" style={{ background: "var(--bg-base)" }}>
-        <RefreshCw size={24} className="animate-spin text-emerald-400" />
+      <div
+        className="h-full flex items-center justify-center"
+        style={{ background: "var(--bg-base)" }}
+      >
+        <RefreshCw size={28} className="animate-spin text-emerald-500" />
       </div>
-    );
+    )
   }
 
   return (
-    <div className="h-full flex flex-col lg:flex-row" style={{ background: "var(--bg-base)" }}>
-      <div className="flex-1 flex flex-col min-h-0 min-w-0">
-        {/* Stepper */}
-        <div
-          className="shrink-0 flex items-center gap-0 px-4 sm:px-6 py-3 sm:py-4 border-b overflow-x-auto"
-          style={{ background: "var(--bg-surface)", borderColor: "var(--border)" }}
-        >
-          {steps.map((s, i) => (
-            <div key={s.id} className="flex items-center shrink-0">
-              <button
-                onClick={() => setStep(s.id)}
-                className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg transition-all"
-                style={{
-                  background: step === s.id ? "rgba(16,185,129,0.12)" : "transparent",
-                  color: step === s.id ? "#10b981" : s.id < step ? "#22c55e" : "var(--text-4)",
-                }}
+    <div
+      className="h-full overflow-y-auto"
+      style={{ background: "var(--bg-base)" }}
+    >
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 animate-fade-in max-w-7xl mx-auto">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1
+                className="font-display font-bold text-2xl sm:text-3xl tracking-tight"
+                style={{ color: "var(--text-1)" }}
               >
-                <span
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                  style={{
-                    background: step === s.id ? "#10b981" : s.id < step ? "rgba(34,197,94,0.2)" : "var(--border)",
-                    color: step === s.id ? "white" : s.id < step ? "#22c55e" : "var(--text-4)",
-                  }}
-                >
-                  {s.id < step ? <Check size={10} /> : s.id}
-                </span>
-                <span className="text-xs font-semibold whitespace-nowrap hidden sm:inline">{s.label}</span>
-              </button>
-              {i < steps.length - 1 && <div className="w-4 sm:w-6 h-px mx-0.5 sm:mx-1" style={{ background: step > s.id ? "#22c55e" : "var(--border)" }} />}
+                Voyage Mission Planner
+              </h1>
+              <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+                Multi-Criteria Matrix
+              </span>
             </div>
-          ))}
+            <p className="text-sm mt-1" style={{ color: "var(--text-3)" }}>
+              Configure hydrodynamics, Well-to-Wake dual-fuel parameters, and Pareto optimization profiles
+            </p>
+          </div>
+
+          <button
+            onClick={handleLaunch}
+            className="btn-primary-action flex items-center gap-2 px-5 py-2.5 text-sm font-bold shadow-md cursor-pointer"
+          >
+            <Zap size={16} /> Launch Quantum Optimizer <ArrowRight size={16} />
+          </button>
         </div>
 
-        {/* Form Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 animate-fade-in">
-          {step === 1 && (
-            <FormSection title="Step 1 — Shipping Corridor Selection">
-              <label className="block text-xs font-semibold mb-2" style={{ color: "var(--text-3)" }}>
-                Select Global Shipping Corridor
-              </label>
-              <div className="space-y-2">
-                {corridors.map((c) => (
-                  <button
-                    key={c.id}
-                    onClick={() =>
-                      setForm((f) => ({
-                        ...f,
-                        corridorId: c.id,
-                        origin: c.origin,
-                        destination: c.destination,
-                        distance: c.distance_nm,
-                      }))
-                    }
-                    className="w-full p-3 rounded-lg border text-left transition-all flex items-center justify-between"
-                    style={{
-                      background: form.corridorId === c.id ? "rgba(16,185,129,0.1)" : "var(--bg-card)",
-                      borderColor: form.corridorId === c.id ? "#10b981" : "var(--border)",
-                    }}
-                  >
-                    <div>
-                      <p className="text-sm font-bold text-white">{c.name}</p>
-                      <p className="text-xs text-slate-400">
-                        {c.origin} → {c.destination} · {c.waypoints.length} Waypoints
-                      </p>
-                    </div>
-                    <span className="font-mono-data text-xs text-emerald-400 font-bold">{c.distance_nm.toLocaleString()} NM</span>
-                  </button>
-                ))}
-              </div>
-            </FormSection>
-          )}
+        {/* ═══════════════════════════════════════════════════════════════════════
+            PLAN PRESETS TEMPLATES BAR
+            ═══════════════════════════════════════════════════════════════════════ */}
+        <div className="panel-solid p-5 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b" style={{ borderColor: "var(--border-sub)" }}>
+            <div>
+              <h2 className="text-sm font-bold flex items-center gap-2" style={{ color: "var(--text-1)" }}>
+                <Layers size={16} className="text-blue-500" /> Optimization Plan Presets
+              </h2>
+              <p className="text-xs" style={{ color: "var(--text-3)" }}>
+                Click any operational plan to load calibrated hydrodynamic parameters & quantum objective weights
+              </p>
+            </div>
+            <span className="text-[11px] font-mono" style={{ color: "var(--text-4)" }}>
+              5 Available Operational Profiles
+            </span>
+          </div>
 
-          {step === 2 && (
-            <FormSection title="Step 2 — Vessel Selection">
-              <label className="block text-xs font-semibold mb-2" style={{ color: "var(--text-3)" }}>
-                Select Active Fleet Vessel
-              </label>
-              <div className="space-y-2">
-                {fleet.map((v) => (
-                  <button
-                    key={v.id}
-                    onClick={() =>
-                      setForm((f) => ({
-                        ...f,
-                        vesselId: v.id,
-                        vesselName: v.name,
-                        vesselType: v.vessel_type_key || "CONTAINER_15000TEU",
-                      }))
-                    }
-                    className="w-full p-3 rounded-lg border text-left transition-all flex items-center justify-between"
-                    style={{
-                      background: form.vesselId === v.id ? "rgba(16,185,129,0.1)" : "var(--bg-card)",
-                      borderColor: form.vesselId === v.id ? "#10b981" : "var(--border)",
-                    }}
-                  >
-                    <div>
-                      <p className="text-sm font-bold text-white">{v.name}</p>
-                      <p className="text-xs text-slate-400">
-                        {v.type} · {v.dwt?.toLocaleString()} DWT
-                      </p>
-                    </div>
-                    <span className="font-mono-data text-xs text-sky-400 font-bold">{v.speed} kn current</span>
-                  </button>
-                ))}
-              </div>
-            </FormSection>
-          )}
-
-          {step === 3 && (
-            <FormSection title="Step 3 — Port Berth Window & Demurrage">
-              <Field label="Target Berthing Arrival Window" value="07:00 – 11:30 UTC, Sep 14" onChange={() => {}} />
-              <Field label="Demurrage Penalty Rate ($/hour)" value="2500" onChange={() => {}} />
-            </FormSection>
-          )}
-
-          {step === 4 && (
-            <FormSection title="Step 4 — Real-Time Metocean Weather Ingestion">
-              <p className="text-xs text-slate-300 mb-2">Live meteorological data connected via OpenMeteo Marine Live API.</p>
-              <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-400 font-medium">
-                ✓ 27 Trade Waypoints streaming real wave heights (Hs), wind velocity, and currents.
-              </div>
-            </FormSection>
-          )}
-
-          {step === 5 && (
-            <FormSection title="Step 5 — Multi-Objective Weights">
-              <SliderField label={`Fuel Cost Weight — ${(form.fuelWeight * 100).toFixed(0)}%`} value={form.fuelWeight} onChange={(v) => set("fuelWeight", v)} color="#10b981" />
-              <SliderField label={`EU ETS Carbon Weight — ${(form.carbonWeight * 100).toFixed(0)}%`} value={form.carbonWeight} onChange={(v) => set("carbonWeight", v)} color="#06b6d4" />
-              <SliderField label={`Port Delay Penalty — ${(form.delayWeight * 100).toFixed(0)}%`} value={form.delayWeight} onChange={(v) => set("delayWeight", v)} color="#f59e0b" />
-              {!weightOk && (
-                <div className="flex items-center gap-2 text-xs p-2 rounded" style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444" }}>
-                  <AlertCircle size={12} /> Weights sum to {(totalWeight * 100).toFixed(0)}% — must equal 100%
-                </div>
-              )}
-            </FormSection>
-          )}
-
-          {step === 6 && (
-            <FormSection title="Step 6 — Multi-Fuel Pathway">
-              <div className="space-y-2">
-                {fuels.map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => set("fuel", f.id)}
-                    className="w-full p-3 rounded-lg border text-left transition-all flex items-center justify-between"
-                    style={{
-                      background: form.fuel === f.id ? "rgba(16,185,129,0.1)" : "var(--bg-card)",
-                      borderColor: form.fuel === f.id ? "#10b981" : "var(--border)",
-                    }}
-                  >
-                    <div>
-                      <p className="text-sm font-bold text-white">{f.name}</p>
-                      <p className="text-xs text-slate-400">WtW Factor: {f.cf_wtw} tCO₂e/t-fuel</p>
-                    </div>
-                    <span className="font-mono-data text-xs text-emerald-400 font-bold">${f.cost_per_mt || 160}/MT</span>
-                  </button>
-                ))}
-              </div>
-              <ToggleField label="High Voltage Shore Power at Berth" sub="Evaluate cold-ironing to eliminate auxiliary boiler emissions" value={form.shorePower} onChange={(v) => set("shorePower", v)} />
-            </FormSection>
-          )}
-
-          {step === 7 && (
-            <FormSection title="Step 7 — Quantum Optimization Algorithm">
-              {[
-                { id: "hybrid_hqoa", label: "Hybrid HQOA (Recommended)", sub: "3-Tier: QGA Macro + QPSO Tunneling + Memetic Refinement", color: "#10b981" },
-                { id: "qpso", label: "Pure QPSO", sub: "Quantum Delta-Potential Particle Swarm", color: "#7c3aed" },
-                { id: "qga", label: "Quantum GA", sub: "Q-Bit Rotation Gate Evolution", color: "#8b5cf6" },
-                { id: "classical_pso", label: "Classical PSO Baseline", sub: "Classical Particle Swarm", color: "#06b6d4" },
-              ].map((a) => (
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+            {PLAN_PRESETS.map((preset) => {
+              const isSelected = activePreset === preset.id
+              return (
                 <button
-                  key={a.id}
-                  onClick={() => set("algorithm", a.id)}
-                  className="w-full p-3 rounded-lg border text-left transition-all flex items-center justify-between mb-2"
+                  key={preset.id}
+                  onClick={() => applyPreset(preset)}
+                  className="p-3.5 rounded-xl border text-left transition-all relative overflow-hidden flex flex-col justify-between backdrop-blur-md cursor-pointer"
                   style={{
-                    background: form.algorithm === a.id ? `${a.color}15` : "var(--bg-card)",
-                    borderColor: form.algorithm === a.id ? a.color : "var(--border)",
+                    background: isSelected ? "var(--bg-hover)" : "var(--bg-surface)",
+                    borderColor: isSelected ? preset.color : "var(--border)",
+                    boxShadow: isSelected ? `0 0 0 1px ${preset.color}40, 0 8px 24px rgba(0,0,0,0.15)` : "none"
                   }}
                 >
+                  {isSelected && (
+                    <div
+                      className="absolute top-0 left-0 right-0 h-1"
+                      style={{ background: preset.color }}
+                    />
+                  )}
                   <div>
-                    <p className="text-sm font-bold text-white">{a.label}</p>
-                    <p className="text-xs text-slate-400">{a.sub}</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <span
+                        className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded"
+                        style={{
+                          background: `${preset.color}20`,
+                          color: preset.color,
+                          border: `1px solid ${preset.color}40`
+                        }}
+                      >
+                        {preset.badge}
+                      </span>
+                      {isSelected && <Check size={14} style={{ color: preset.color }} />}
+                    </div>
+                    <p className="text-xs font-bold truncate mt-1" style={{ color: "var(--text-1)" }}>
+                      {preset.name}
+                    </p>
+                    <p className="text-[11px] mt-1 line-clamp-2" style={{ color: "var(--text-3)" }}>
+                      {preset.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 pt-2 border-t text-[10px] font-mono font-bold" style={{ borderColor: "var(--border-sub)", color: preset.color }}>
+                    {preset.highlights}
                   </div>
                 </button>
-              ))}
-            </FormSection>
-          )}
+              )
+            })}
+          </div>
+        </div>
 
-          {step === 8 && (
-            <FormSection title="Step 8 — Review & Launch Optimization">
-              <div className="p-4 rounded-xl border space-y-2 text-xs" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
-                <div className="flex justify-between py-1 border-b border-slate-700">
-                  <span className="text-slate-400">Route:</span> <strong className="text-white">{form.origin} → {form.destination}</strong>
+        {/* Split Mission Planning Workspace */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Left Pane (5 cols): Spatial Corridor & Waypoint Inspector */}
+          <div className="lg:col-span-5 space-y-5">
+            
+            {/* Corridor Selector Card */}
+            <div className="panel-solid p-5 space-y-4">
+              <div
+                className="flex items-center justify-between pb-3 border-b"
+                style={{ borderColor: "var(--border-sub)" }}
+              >
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                  <Navigation size={14} /> Shipping Lane
+                </span>
+                <span className="text-xs font-mono-data font-bold text-sky-600 dark:text-sky-400">
+                  {selectedCorridor?.distance_nm.toLocaleString()} NM
+                </span>
+              </div>
+
+              <div>
+                <label
+                  className="text-xs font-semibold uppercase tracking-wider block mb-1.5"
+                  style={{ color: "var(--text-3)" }}
+                >
+                  Select Global Corridor
+                </label>
+                <select
+                  value={corridorId}
+                  onChange={(e) => setCorridorId(e.target.value)}
+                  className="w-full input-marine text-sm"
+                >
+                  {corridors.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} ({c.distance_nm.toLocaleString()} NM)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div
+                  className="p-3 rounded-md border"
+                  style={{
+                    background: "var(--bg-surface)",
+                    borderColor: "var(--border)",
+                  }}
+                >
+                  <span
+                    className="text-[11px] block font-semibold"
+                    style={{ color: "var(--text-4)" }}
+                  >
+                    Port of Origin
+                  </span>
+                  <span
+                    className="text-sm font-bold mt-0.5 block"
+                    style={{ color: "var(--text-1)" }}
+                  >
+                    {selectedCorridor?.origin}
+                  </span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-700">
-                  <span className="text-slate-400">Distance:</span> <strong className="text-emerald-400">{form.distance} NM</strong>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-700">
-                  <span className="text-slate-400">Vessel:</span> <strong className="text-white">{form.vesselName}</strong>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-700">
-                  <span className="text-slate-400">Algorithm:</span> <strong className="text-purple-400">{form.algorithm.toUpperCase()}</strong>
-                </div>
-                <div className="flex justify-between py-1">
-                  <span className="text-slate-400">Fuel:</span> <strong className="text-white">{form.fuel.toUpperCase()} + Shore Power</strong>
+                <div
+                  className="p-3 rounded-md border"
+                  style={{
+                    background: "var(--bg-surface)",
+                    borderColor: "var(--border)",
+                  }}
+                >
+                  <span
+                    className="text-[11px] block font-semibold"
+                    style={{ color: "var(--text-4)" }}
+                  >
+                    Destination
+                  </span>
+                  <span
+                    className="text-sm font-bold mt-0.5 block"
+                    style={{ color: "var(--text-1)" }}
+                  >
+                    {selectedCorridor?.destination}
+                  </span>
                 </div>
               </div>
-            </FormSection>
-          )}
+            </div>
+
+            {/* Waypoint Legs Inspector */}
+            <div className="panel-solid p-5">
+              <div
+                className="flex items-center justify-between mb-3 pb-2 border-b"
+                style={{ borderColor: "var(--border-sub)" }}
+              >
+                <span
+                  className="text-xs font-bold uppercase tracking-wider"
+                  style={{ color: "var(--text-1)" }}
+                >
+                  Route Legs ({selectedCorridor?.waypoints.length ? selectedCorridor.waypoints.length - 1 : 0} Segments)
+                </span>
+                <span className="text-xs" style={{ color: "var(--text-4)" }}>
+                  Copernicus Currents Live
+                </span>
+              </div>
+
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                {selectedCorridor?.waypoints.map((wp, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-2.5 rounded-lg border text-xs"
+                    style={{
+                      background: "var(--bg-surface)",
+                      borderColor: "var(--border-sub)",
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-5 h-5 rounded flex items-center justify-center font-mono font-bold text-[10px]"
+                        style={{
+                          background: "var(--bg-hover)",
+                          color: "var(--text-2)",
+                        }}
+                      >
+                        {idx + 1}
+                      </span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: "var(--text-1)" }}
+                      >
+                        {wp.name}
+                      </span>
+                    </div>
+                    <span
+                      className="font-mono-data"
+                      style={{ color: "var(--text-4)" }}
+                    >
+                      {wp.lat.toFixed(2)}°, {wp.lng.toFixed(2)}°
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Pane (7 cols): Parameters, Dual-Fuel & Objective Balancing */}
+          <div className="lg:col-span-7 space-y-5">
+            
+            {/* Vessel Selection & Speed Bounds */}
+            <div className="panel-solid p-5 space-y-4">
+              <h3
+                className="text-sm font-bold pb-2 border-b"
+                style={{
+                  color: "var(--text-1)",
+                  borderColor: "var(--border-sub)",
+                }}
+              >
+                Vessel Hydrodynamics & Speed Envelope
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    className="text-xs font-semibold uppercase tracking-wider block mb-1.5"
+                    style={{ color: "var(--text-3)" }}
+                  >
+                    Assigned Fleet Vessel
+                  </label>
+                  <select
+                    value={vesselId}
+                    onChange={(e) => {
+                      setVesselId(e.target.value)
+                      const f = fleet.find((item) => item.id === e.target.value)
+                      if (f?.vessel_type_key) setVesselType(f.vessel_type_key)
+                    }}
+                    className="w-full input-marine"
+                  >
+                    {fleet.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name} ({v.type})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    className="text-xs font-semibold uppercase tracking-wider block mb-1.5"
+                    style={{ color: "var(--text-3)" }}
+                  >
+                    Vessel Hull Profile
+                  </label>
+                  <select
+                    value={vesselType}
+                    onChange={(e) => setVesselType(e.target.value)}
+                    className="w-full input-marine"
+                  >
+                    <option value="CONTAINER_15000TEU">
+                      Ultra Large Container (15,000 TEU)
+                    </option>
+                    <option value="VLCC">VLCC Tanker (298,000 DWT)</option>
+                    <option value="CAPESIZE">
+                      Capesize Bulk Carrier (178,000 DWT)
+                    </option>
+                    <option value="PANAMAX">
+                      Panamax Bulk Carrier (74,000 DWT)
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Speed Limits Slider */}
+              <div className="pt-2">
+                <div className="flex justify-between text-xs mb-1 font-semibold">
+                  <span style={{ color: "var(--text-3)" }}>
+                    Speed Bounds (SOG Envelope)
+                  </span>
+                  <span className="font-mono-data text-sky-400 font-bold">
+                    {minSpeed.toFixed(1)} kn − {maxSpeed.toFixed(1)} kn
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span
+                      className="text-[10px] font-medium"
+                      style={{ color: "var(--text-3)" }}
+                    >
+                      Min Speed (knots)
+                    </span>
+                    <input
+                      type="range"
+                      min="9.0"
+                      max="14.0"
+                      step="0.5"
+                      value={minSpeed}
+                      onChange={(e) => setMinSpeed(parseFloat(e.target.value))}
+                    />
+                  </div>
+                  <div>
+                    <span
+                      className="text-[10px] font-medium"
+                      style={{ color: "var(--text-3)" }}
+                    >
+                      Max Speed (knots)
+                    </span>
+                    <input
+                      type="range"
+                      min="15.0"
+                      max="22.0"
+                      step="0.5"
+                      value={maxSpeed}
+                      onChange={(e) => setMaxSpeed(parseFloat(e.target.value))}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Fuel Pathway Selection */}
+            <div className="panel-solid p-5 space-y-4">
+              <h3
+                className="text-sm font-bold pb-2 border-b"
+                style={{
+                  color: "var(--text-1)",
+                  borderColor: "var(--border-sub)",
+                }}
+              >
+                Well-to-Wake Lifecycle Fuel Pathway
+              </h3>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {fuels.map((f) => {
+                  const isSelected = fuelType === f.id
+                  return (
+                    <button
+                      key={f.id}
+                      onClick={() => setFuelType(f.id)}
+                      className="p-3 rounded-lg border text-left transition-all"
+                      style={{
+                        background: isSelected
+                          ? "rgba(16,185,129,0.12)"
+                          : "var(--bg-surface)",
+                        borderColor: isSelected ? "#10b981" : "var(--border)",
+                      }}
+                    >
+                      <span
+                        className="text-xs font-bold block"
+                        style={{
+                          color: isSelected ? "#10b981" : "var(--text-1)",
+                        }}
+                      >
+                        {f.name}
+                      </span>
+                      <span
+                        className="text-[10px] font-mono-data block mt-1"
+                        style={{ color: "var(--text-4)" }}
+                      >
+                        WtW: {f.cf_wtw} t-CO₂e/t
+                      </span>
+                      <span className="text-[11px] font-mono-data font-bold mt-1 block text-sky-400">
+                        ${f.cost_per_mt}/MT
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Objective Balancing (Tri-Weight Matrix) */}
+            <div className="panel-solid p-5 space-y-4">
+              <div
+                className="flex items-center justify-between pb-2 border-b"
+                style={{ borderColor: "var(--border-sub)" }}
+              >
+                <h3
+                  className="text-sm font-bold"
+                  style={{ color: "var(--text-1)" }}
+                >
+                  Pareto Objective Weights
+                </h3>
+                <span className="text-xs font-mono-data text-emerald-400 font-bold">
+                  Sum: {Math.round((fuelWeight + carbonWeight + delayWeight) * 100)}%
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span
+                      className="font-semibold"
+                      style={{ color: "var(--text-2)" }}
+                    >
+                      Fuel Bunkering Cost
+                    </span>
+                    <span className="font-mono-data font-bold text-sky-400">
+                      {Math.round(fuelWeight * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="0.8"
+                    step="0.05"
+                    value={fuelWeight}
+                    onChange={(e) => setFuelWeight(parseFloat(e.target.value))}
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span
+                      className="font-semibold"
+                      style={{ color: "var(--text-2)" }}
+                    >
+                      CO₂e Lifecycle Emissions
+                    </span>
+                    <span className="font-mono-data font-bold text-emerald-400">
+                      {Math.round(carbonWeight * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="0.8"
+                    step="0.05"
+                    value={carbonWeight}
+                    onChange={(e) => setCarbonWeight(parseFloat(e.target.value))}
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span
+                      className="font-semibold"
+                      style={{ color: "var(--text-2)" }}
+                    >
+                      ETA Schedule Delay Penalty
+                    </span>
+                    <span className="font-mono-data font-bold text-amber-400">
+                      {Math.round(delayWeight * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.0"
+                    max="0.6"
+                    step="0.05"
+                    value={delayWeight}
+                    onChange={(e) => setDelayWeight(parseFloat(e.target.value))}
+                  />
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
 
-        {/* Navigation Footer */}
-        <div
-          className="shrink-0 flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-t"
-          style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
-        >
-          <button
-            disabled={step === 1}
-            onClick={() => setStep(Math.max(1, step - 1))}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border disabled:opacity-40"
-            style={{ border: "1px solid var(--border)", color: "var(--text-2)", background: "transparent" }}
-          >
-            <ChevronLeft size={14} /> Back
-          </button>
-          {step < 8 ? (
-            <button
-              onClick={() => setStep(Math.min(8, step + 1))}
-              className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-xs font-semibold bg-emerald-500 text-white"
-            >
-              Continue <ChevronRight size={14} />
-            </button>
-          ) : (
-            <button
-              onClick={() => onNavigate("console")}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-xs font-bold bg-gradient-to-r from-purple-600 to-emerald-500 text-white shadow-lg"
-            >
-              <Zap size={14} /> Run Live Quantum Solver
-            </button>
-          )}
-        </div>
       </div>
     </div>
-  );
-}
-
-function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="max-w-xl space-y-4">
-      <h2 className="font-display font-bold text-base text-white">{title}</h2>
-      {children}
-    </div>
-  );
-}
-
-function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
-  return (
-    <div>
-      <label className="block text-xs font-semibold mb-1.5 text-slate-300">{label}</label>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2.5 rounded-lg text-xs outline-none border border-slate-700 bg-slate-900 text-white"
-      />
-    </div>
-  );
-}
-
-function SliderField({ label, value, onChange, color }: { label: string; value: number; onChange: (v: number) => void; color: string }) {
-  return (
-    <div className="mb-3">
-      <label className="block text-xs font-semibold mb-2 text-slate-300">{label}</label>
-      <input
-        type="range"
-        min="0.05"
-        max="0.9"
-        step="0.05"
-        value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
-        style={{ background: `linear-gradient(to right, ${color} ${value * 100}%, var(--border) ${value * 100}%)` }}
-      />
-    </div>
-  );
-}
-
-function ToggleField({ label, sub, value, onChange }: { label: string; sub: string; value: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <div className="flex items-start justify-between gap-4 py-2">
-      <div>
-        <p className="text-xs font-semibold text-white">{label}</p>
-        <p className="text-[11px] text-slate-400">{sub}</p>
-      </div>
-      <button
-        onClick={() => onChange(!value)}
-        className="shrink-0 rounded-full relative transition-colors"
-        style={{ background: value ? "#10b981" : "var(--border)", width: 40, height: 22 }}
-      >
-        <div
-          className="absolute top-0.5 rounded-full bg-white shadow transition-all"
-          style={{ left: value ? 20 : 2, width: 18, height: 18 }}
-        />
-      </button>
-    </div>
-  );
+  )
 }
