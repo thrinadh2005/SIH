@@ -168,32 +168,41 @@ export default function WorkflowScreen({
   const [activeTab, setActiveTab] = useState<"overview" | "equations" | "telemetry">("overview")
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto overflow-y-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto overflow-y-auto animate-fade-in">
       {/* Header Banner */}
-      <div className="glass-card p-6 rounded-2xl relative overflow-hidden border border-cyan-500/20">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-cyan-500/10 via-purple-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div
+        className="panel-solid p-6 rounded-2xl relative overflow-hidden border shadow-lg"
+        style={{
+          borderColor: "var(--border)",
+          background: "linear-gradient(135deg, var(--bg-card) 0%, var(--bg-surface) 100%)",
+        }}
+      >
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-cyan-500/15 via-blue-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
         
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 text-xs font-bold rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="px-3 py-1 text-xs font-bold rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
                 SYSTEM ARCHITECTURE & PIPELINE
               </span>
-              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+              <span className="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
                 SIH-26138
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
+            <h1
+              className="font-display text-2xl md:text-3xl font-bold tracking-tight"
+              style={{ color: "var(--text-1)" }}
+            >
               GreenFleet Quantum: End-to-End Operational Workflow
             </h1>
-            <p className="text-sm text-slate-400 mt-1 max-w-3xl">
+            <p className="text-sm mt-1 max-w-3xl leading-relaxed" style={{ color: "var(--text-3)" }}>
               How real-time satellite ocean data flows through Holtrop-Mennen hydrodynamics, 156-qubit quantum optimization, bridge ECDIS navigation, and automated IMO CII compliance.
             </p>
           </div>
 
           <button
             onClick={() => onNavigate("optimizer")}
-            className="px-5 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/25 flex items-center gap-2 transition-all"
+            className="btn-primary-action px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 shadow-md"
           >
             <Zap className="w-4 h-4" />
             Launch Live Optimizer
@@ -212,40 +221,47 @@ export default function WorkflowScreen({
             <button
               key={stage.id}
               onClick={() => setSelectedStage(stage)}
-              className={`text-left p-4 rounded-xl border transition-all relative overflow-hidden flex flex-col justify-between ${
-                isSelected
-                  ? "border-cyan-500 bg-cyan-950/40 shadow-lg shadow-cyan-500/10 scale-[1.02]"
-                  : "border-slate-800/80 bg-slate-900/50 hover:border-slate-700 hover:bg-slate-850"
-              }`}
+              className="text-left p-4 rounded-xl border transition-all relative overflow-hidden flex flex-col justify-between cursor-pointer backdrop-blur-md"
+              style={{
+                background: isSelected ? "var(--bg-card-hover)" : "var(--bg-card)",
+                borderColor: isSelected ? stage.color : "var(--border)",
+                boxShadow: isSelected
+                  ? `0 0 0 1px ${stage.color}60, 0 8px 24px rgba(0,0,0,0.2)`
+                  : "0 4px 12px var(--glass-shadow)",
+                transform: isSelected ? "translateY(-2px)" : "none",
+              }}
             >
               <div className="flex items-center justify-between mb-3">
                 <div
                   className="w-10 h-10 rounded-lg flex items-center justify-center border"
                   style={{
-                    background: `${stage.color}15`,
-                    borderColor: `${stage.color}40`,
+                    background: `${stage.color}20`,
+                    borderColor: `${stage.color}50`,
                     color: stage.color,
                   }}
                 >
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-500">
+                <span className="text-xs font-mono font-bold" style={{ color: "var(--text-4)" }}>
                   STAGE 0{stage.id}
                 </span>
               </div>
 
               <div>
-                <h3 className="font-bold text-sm text-white line-clamp-1 mb-1">
+                <h3
+                  className="font-bold text-sm line-clamp-1 mb-1"
+                  style={{ color: isSelected ? stage.color : "var(--text-1)" }}
+                >
                   {stage.title.split(". ")[1]}
                 </h3>
-                <p className="text-xs text-slate-400 line-clamp-2">
+                <p className="text-xs line-clamp-2" style={{ color: "var(--text-3)" }}>
                   {stage.subtitle}
                 </p>
               </div>
 
               {isSelected && (
                 <div
-                  className="h-1 w-full mt-3 rounded-full"
+                  className="h-1 w-full mt-3 rounded-full shadow-sm"
                   style={{ background: stage.color }}
                 />
               )}
@@ -257,55 +273,64 @@ export default function WorkflowScreen({
       {/* Deep-Dive Stage Inspector */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Detailed Stage Execution */}
-        <div className="lg:col-span-2 glass-card p-6 rounded-2xl border border-slate-800 space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
-            <div className="flex items-center gap-3">
+        <div className="lg:col-span-2 panel-solid p-6 rounded-2xl border space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b" style={{ borderColor: "var(--border-sub)" }}>
+            <div className="flex items-center gap-3.5">
               <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center border"
+                className="w-12 h-12 rounded-xl flex items-center justify-center border shadow-inner shrink-0"
                 style={{
-                  background: `${selectedStage.color}20`,
-                  borderColor: `${selectedStage.color}50`,
+                  background: `${selectedStage.color}25`,
+                  borderColor: `${selectedStage.color}60`,
                   color: selectedStage.color,
                 }}
               >
                 <selectedStage.icon className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">
+                <h2 className="text-lg sm:text-xl font-bold font-display" style={{ color: "var(--text-1)" }}>
                   {selectedStage.title}
                 </h2>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>
                   {selectedStage.subtitle}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono px-3 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+              <span
+                className="text-xs font-mono px-3 py-1 rounded-md border font-semibold"
+                style={{
+                  background: "var(--bg-input)",
+                  color: "var(--text-2)",
+                  borderColor: "var(--border)",
+                }}
+              >
                 {selectedStage.techStack.split(" · ")[0]}
               </span>
             </div>
           </div>
 
           {/* Tab Selection */}
-          <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+          <div className="flex items-center gap-2 pb-2 border-b" style={{ borderColor: "var(--border-sub)" }}>
             <button
               onClick={() => setActiveTab("overview")}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTab === "overview"
-                  ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40"
-                  : "text-slate-400 hover:text-white"
-              }`}
+              className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
+              style={{
+                background: activeTab === "overview" ? "rgba(14, 165, 233, 0.2)" : "transparent",
+                color: activeTab === "overview" ? "#38bdf8" : "var(--text-4)",
+                border: activeTab === "overview" ? "1px solid rgba(14, 165, 233, 0.45)" : "1px solid transparent",
+              }}
             >
               Stage Architecture & Inputs/Outputs
             </button>
             <button
               onClick={() => setActiveTab("equations")}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                activeTab === "equations"
-                  ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/40"
-                  : "text-slate-400 hover:text-white"
-              }`}
+              className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
+              style={{
+                background: activeTab === "equations" ? "rgba(14, 165, 233, 0.2)" : "transparent",
+                color: activeTab === "equations" ? "#38bdf8" : "var(--text-4)",
+                border: activeTab === "equations" ? "1px solid rgba(14, 165, 233, 0.45)" : "1px solid transparent",
+              }}
             >
               Naval Physics & Quantum Formulations
             </button>
@@ -314,71 +339,98 @@ export default function WorkflowScreen({
           {activeTab === "overview" ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Inputs */}
-              <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+              <div
+                className="p-4 rounded-xl border space-y-2.5 backdrop-blur-sm"
+                style={{ background: "var(--bg-input)", borderColor: "var(--border)" }}
+              >
                 <div className="flex items-center gap-2 text-xs font-bold text-sky-400">
                   <Database className="w-4 h-4" />
                   DATA INGESTION / INPUTS
                 </div>
-                <ul className="space-y-1.5">
+                <ul className="space-y-2">
                   {selectedStage.inputs.map((inp, i) => (
-                    <li key={i} className="text-xs text-slate-300 flex items-start gap-2">
+                    <li key={i} className="text-xs flex items-start gap-2" style={{ color: "var(--text-2)" }}>
                       <span className="text-sky-400 font-bold">•</span>
-                      <span>{inp}</span>
+                      <span className="leading-relaxed">{inp}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Processing */}
-              <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+              <div
+                className="p-4 rounded-xl border space-y-2.5 backdrop-blur-sm"
+                style={{ background: "var(--bg-input)", borderColor: "var(--border)" }}
+              >
                 <div className="flex items-center gap-2 text-xs font-bold text-purple-400">
                   <Activity className="w-4 h-4" />
                   CORE COMPUTATION ENGINE
                 </div>
-                <ul className="space-y-1.5">
+                <ul className="space-y-2">
                   {selectedStage.process.map((prc, i) => (
-                    <li key={i} className="text-xs text-slate-300 flex items-start gap-2">
+                    <li key={i} className="text-xs flex items-start gap-2" style={{ color: "var(--text-2)" }}>
                       <span className="text-purple-400 font-bold">→</span>
-                      <span>{prc}</span>
+                      <span className="leading-relaxed">{prc}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Outputs */}
-              <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
+              <div
+                className="p-4 rounded-xl border space-y-2.5 backdrop-blur-sm"
+                style={{ background: "var(--bg-input)", borderColor: "var(--border)" }}
+              >
                 <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
                   <CheckCircle2 className="w-4 h-4" />
                   DECISION TELEMETRY OUTPUT
                 </div>
-                <ul className="space-y-1.5">
+                <ul className="space-y-2">
                   {selectedStage.outputs.map((out, i) => (
-                    <li key={i} className="text-xs text-slate-300 flex items-start gap-2">
+                    <li key={i} className="text-xs flex items-start gap-2" style={{ color: "var(--text-2)" }}>
                       <span className="text-emerald-400 font-bold">✓</span>
-                      <span>{out}</span>
+                      <span className="leading-relaxed">{out}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
           ) : (
-            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs space-y-3">
-              <div className="text-slate-400 text-xs">Governing Standard & Mathematical Equation:</div>
-              <div className="p-3 rounded-lg bg-slate-900 text-cyan-300 text-sm font-bold border border-cyan-900/50">
+            <div
+              className="p-4 rounded-xl border font-mono text-xs space-y-3"
+              style={{ background: "var(--bg-input)", borderColor: "var(--border)" }}
+            >
+              <div className="text-xs font-semibold" style={{ color: "var(--text-4)" }}>
+                Governing Standard & Mathematical Equation:
+              </div>
+              <div
+                className="p-3.5 rounded-lg text-cyan-300 text-sm font-bold border"
+                style={{
+                  background: "rgba(8, 14, 28, 0.95)",
+                  borderColor: "rgba(14, 165, 233, 0.35)",
+                }}
+              >
                 {selectedStage.equations}
               </div>
-              <div className="text-slate-400 text-xs mt-2">
-                Implementation Stack: <span className="text-emerald-400 font-semibold">{selectedStage.techStack}</span>
+              <div className="text-xs mt-2" style={{ color: "var(--text-3)" }}>
+                Implementation Stack:{" "}
+                <span className="text-emerald-400 font-semibold">{selectedStage.techStack}</span>
               </div>
             </div>
           )}
 
           {/* Flow Indicator Banner */}
-          <div className="p-3 rounded-xl bg-gradient-to-r from-slate-900 via-cyan-950/30 to-slate-900 border border-cyan-500/20 flex items-center justify-between">
+          <div
+            className="p-3.5 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+            style={{
+              background: "linear-gradient(90deg, var(--bg-card) 0%, rgba(14, 165, 233, 0.12) 50%, var(--bg-card) 100%)",
+              borderColor: "rgba(14, 165, 233, 0.3)",
+            }}
+          >
             <div className="flex items-center gap-3">
-              <Sparkles className="w-5 h-5 text-cyan-400 animate-pulse" />
-              <div className="text-xs text-slate-300">
-                <span className="font-bold text-white">Live Execution Pipeline:</span> Sub-second response time across 10 transoceanic legs with zero-noise extrapolation.
+              <Sparkles className="w-5 h-5 text-cyan-400 animate-pulse shrink-0" />
+              <div className="text-xs" style={{ color: "var(--text-2)" }}>
+                <strong style={{ color: "var(--text-1)" }}>Live Execution Pipeline:</strong> Sub-second response time across 10 transoceanic legs with zero-noise extrapolation.
               </div>
             </div>
             <button
@@ -386,7 +438,12 @@ export default function WorkflowScreen({
                 const nextId = (selectedStage.id % 5) + 1
                 setSelectedStage(STAGES[nextId - 1])
               }}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold border flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0 transition-all hover:brightness-110"
+              style={{
+                background: "var(--bg-hover)",
+                color: "var(--text-1)",
+                borderColor: "var(--border)",
+              }}
             >
               Next Stage
               <ArrowRight className="w-3.5 h-3.5" />
@@ -395,38 +452,72 @@ export default function WorkflowScreen({
         </div>
 
         {/* Right 1 Col: Key Benefits & Impact Card */}
-        <div className="glass-card p-6 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-6">
+        <div className="panel-solid p-6 rounded-2xl border flex flex-col justify-between space-y-6">
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b" style={{ borderColor: "var(--border-sub)" }}>
               <ShieldCheck className="w-5 h-5 text-emerald-400" />
-              <h3 className="font-bold text-white text-base">
+              <h3 className="font-bold text-base font-display" style={{ color: "var(--text-1)" }}>
                 Pipeline Value & Performance
               </h3>
             </div>
 
-            <div className="space-y-3">
-              <div className="p-3.5 rounded-xl bg-slate-900/70 border border-slate-800">
-                <div className="text-xs text-slate-400">Verified Fuel & CO₂ Reduction</div>
-                <div className="text-2xl font-bold text-emerald-400 mt-0.5">16.85%</div>
-                <div className="text-xs text-slate-500">Holtrop-Mennen & HQOA Pareto Minimum</div>
+            <div className="space-y-3.5">
+              <div
+                className="p-4 rounded-xl border"
+                style={{ background: "var(--bg-input)", borderColor: "var(--border)" }}
+              >
+                <div className="text-xs font-semibold" style={{ color: "var(--text-4)" }}>
+                  Verified Fuel & CO₂ Reduction
+                </div>
+                <div className="text-2xl font-bold font-mono-data text-emerald-400 mt-1">
+                  16.85%
+                </div>
+                <div className="text-[11px] mt-0.5" style={{ color: "var(--text-5)" }}>
+                  Holtrop-Mennen & HQOA Pareto Minimum
+                </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-900/70 border border-slate-800">
-                <div className="text-xs text-slate-400">Voyage Bunker OPEX Saved</div>
-                <div className="text-2xl font-bold text-cyan-400 mt-0.5">$237,800 USD</div>
-                <div className="text-xs text-slate-500">Per 15k TEU transoceanic crossing</div>
+              <div
+                className="p-4 rounded-xl border"
+                style={{ background: "var(--bg-input)", borderColor: "var(--border)" }}
+              >
+                <div className="text-xs font-semibold" style={{ color: "var(--text-4)" }}>
+                  Voyage Bunker OPEX Saved
+                </div>
+                <div className="text-2xl font-bold font-mono-data text-cyan-400 mt-1">
+                  $237,800 USD
+                </div>
+                <div className="text-[11px] mt-0.5" style={{ color: "var(--text-5)" }}>
+                  Per 15k TEU transoceanic crossing
+                </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-900/70 border border-slate-800">
-                <div className="text-xs text-slate-400">IMO CII Compliance Rating</div>
-                <div className="text-2xl font-bold text-yellow-400 mt-0.5">GRADE A (Certified)</div>
-                <div className="text-xs text-slate-500">Cryptographic SHA-256 verified XML</div>
+              <div
+                className="p-4 rounded-xl border"
+                style={{ background: "var(--bg-input)", borderColor: "var(--border)" }}
+              >
+                <div className="text-xs font-semibold" style={{ color: "var(--text-4)" }}>
+                  IMO CII Compliance Rating
+                </div>
+                <div className="text-2xl font-bold font-mono-data text-amber-400 mt-1">
+                  GRADE A (Certified)
+                </div>
+                <div className="text-[11px] mt-0.5" style={{ color: "var(--text-5)" }}>
+                  Cryptographic SHA-256 verified XML
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-cyan-950/30 border border-cyan-500/20 text-xs text-slate-300">
-            <span className="font-bold text-cyan-300">Ready to demonstrate:</span> Open the Voyage Optimizer to run the 156-qubit quantum circuit live.
+          <div
+            className="p-4 rounded-xl border text-xs leading-relaxed"
+            style={{
+              background: "rgba(14, 165, 233, 0.12)",
+              borderColor: "rgba(14, 165, 233, 0.35)",
+              color: "var(--text-2)",
+            }}
+          >
+            <strong className="text-cyan-400 block mb-0.5">Ready to demonstrate:</strong> Open the Voyage Optimizer to run the 156-qubit quantum circuit live.
           </div>
         </div>
       </div>

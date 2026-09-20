@@ -303,9 +303,9 @@ OVERALL DEMO AUDIT SCORE: 34/34 Passed (100.0%)
 
 ## 11. Master Presentation Script & Evaluation Dossier
 
-* **Spoken Presentation Guide:** [`MASTER_PRESENTATION_SCRIPT.md`](MASTER_PRESENTATION_SCRIPT.md) contains the complete word-for-word pitch in natural, simple English.
-* **Master Evaluation PDF:** [`GreenFleet_Quantum_Master_Presentation_Script_and_Project_Guide.pdf`](GreenFleet_Quantum_Master_Presentation_Script_and_Project_Guide.pdf) provides the full printable dossier.
-* **Submission Presentation Slides:** [`SIH2026_GreenFleet_Quantum_Idea_Presentation.pptx`](SIH2026_GreenFleet_Quantum_Idea_Presentation.pptx) and [`SIH2026_GreenFleet_Quantum_Idea.pdf`](SIH2026_GreenFleet_Quantum_Idea.pdf).
+* **Spoken Presentation Guide:** [`MASTER_PRESENTATION_SCRIPT.md`](presentation_and_video/MASTER_PRESENTATION_SCRIPT.md) contains the complete word-for-word pitch in natural, simple English.
+* **Master Evaluation PDF:** [`GreenFleet_Quantum_Master_Presentation_Script_and_Project_Guide.pdf`](presentation_and_video/GreenFleet_Quantum_Master_Presentation_Script_and_Project_Guide.pdf) provides the full printable dossier.
+* **Submission Presentation Slides:** [`SIH2026_GreenFleet_Quantum_Idea_Presentation.pptx`](presentation_and_video/SIH2026_GreenFleet_Quantum_Idea_Presentation.pptx) and [`SIH2026_GreenFleet_Quantum_Idea.pdf`](presentation_and_video/SIH2026_GreenFleet_Quantum_Idea.pdf).
 
 ---
 

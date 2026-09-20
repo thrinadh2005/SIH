@@ -34,7 +34,7 @@ export interface Corridor {
   origin: string
   destination: string
   distance_nm: number
-  waypoints: Array<{ name: string lat: number lng: number }>
+  waypoints: Array<{ name: string; lat: number; lng: number }>
 }
 
 export interface FuelPathwayInfo {

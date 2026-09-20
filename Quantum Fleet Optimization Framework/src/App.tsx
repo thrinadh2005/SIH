@@ -10,6 +10,7 @@ import {
   DollarSign,
   Users,
   Radio,
+  Layers,
 } from "lucide-react"
 import Sidebar from "./components/layout/Sidebar"
 import TopBar from "./components/layout/TopBar"

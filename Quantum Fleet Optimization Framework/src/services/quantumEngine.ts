@@ -314,7 +314,7 @@ export interface OptimizationStepState {
   bestCost: number
   betaContraction: number
   tunnelingEvents: number
-  particles: Array<{ x: number y: number vx: number vy: number }>
+  particles: Array<{ x: number; y: number; vx: number; vy: number }>
   stageName: string
 }
 

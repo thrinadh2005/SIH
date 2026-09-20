@@ -72,7 +72,7 @@ export interface ShippingCorridor {
   origin: string
   destination: string
   distance_nm: number
-  waypoints: Array<{ name: string lat: number lng: number }>
+  waypoints: Array<{ name: string; lat: number; lng: number }>
 }
 
 export interface OptimizationResponse {
@@ -242,7 +242,7 @@ export interface FnoForecastResponse {
 export interface SwarmOptimizeResponse {
   terminal_id: string
   terminal_name: string
-  terminal_coordinates: { lat: number lng: number }
+  terminal_coordinates: { lat: number; lng: number }
   convoy_vessels_count: number
   negotiation_protocol: string
   summary_metrics: {
@@ -316,7 +316,7 @@ export interface BunkerArbitrageResponse {
   port_rankings: Array<{
     port_id: string
     name: string
-    coordinates: { lat: number lng: number }
+    coordinates: { lat: number; lng: number }
     fuel_type: string
     spot_price_usd_mt: number
     fuel_procured_mt: number
@@ -652,7 +652,7 @@ export async function fetchGlobalPorts(): Promise<{
 
 export async function fetchBenchmarkTournament(
   corridorId: string = "SIN_ROT",
-): Promise<{ corridor_id: string results: any[] }> {
+): Promise<{ corridor_id: string; results: any[] }> {
   const res = await fetch(
     `${BACKEND_API_BASE}/benchmarks/tournament?corridor_id=${corridorId}`,
     { signal: AbortSignal.timeout(5000) },

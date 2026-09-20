@@ -82,7 +82,7 @@ export default function FleetManagement({ onNavigate }: Props) {
       return 0
     })
 
-  const SortTh = ({ label, k }: { label: string k: typeof sortKey }) => (
+  const SortTh = ({ label, k }: { label: string; k: typeof sortKey }) => (
     <th className="cursor-pointer select-none" onClick={() => setSort(k)}>
       {label} {sortKey === k ? (sortDir === 1 ? "↑" : "↓") : ""}
     </th>

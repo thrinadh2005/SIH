@@ -20,10 +20,32 @@ os.chdir(ROOT_DIR)
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
+def free_ports(*ports):
+    for port in ports:
+        try:
+            res = subprocess.run(f"netstat -ano | findstr :{port}", shell=True, capture_output=True, text=True)
+            for line in res.stdout.strip().splitlines():
+                parts = line.split()
+                if len(parts) >= 5 and "LISTENING" in parts:
+                    pid = parts[-1]
+                    if pid.isdigit() and int(pid) > 0:
+                        subprocess.run(f"taskkill /F /PID {pid}", shell=True, capture_output=True)
+        except Exception:
+            pass
+
 def verify_system():
+    if "--stop" in sys.argv:
+        print("[*] Terminating GreenFleet Quantum background services...")
+        free_ports(8000, 8443)
+        print("[*] Services stopped cleanly.")
+        return
+
     print("=" * 70)
     print("GREENFLEET QUANTUM: PRODUCTION SYSTEM BOOTSTRAP (SIH-26138)")
     print("=" * 70)
+    
+    # 0. Free busy ports if stale
+    free_ports(8000, 8443)
 
     # 1. Check datasets
     print("\n1. Verifying Datasets in 'data/'...")
@@ -66,23 +88,26 @@ def verify_system():
         print(f"   [!] Database status: {e}")
 
     # 4. Check backend API
-    print("\n4. Verifying FastAPI Microservice...")
-    try:
-        req = urllib.request.urlopen("http://localhost:8000/api/v1/health", timeout=2.5)
-        data = json.loads(req.read().decode())
-        print(f"   * FastAPI Backend LIVE on port 8000 (Engine: {data['quantum_engine']})")
-    except Exception:
-        print("   [!] Starting FastAPI server...")
-        subprocess.Popen([sys.executable, "backend/main.py"])
-        time.sleep(2)
-        print("   * FastAPI Server launched on port 8000.")
+    if "--init-only" not in sys.argv:
+        print("\n4. Verifying FastAPI Microservice...")
+        try:
+            req = urllib.request.urlopen("http://localhost:8000/api/v1/health", timeout=2.5)
+            data = json.loads(req.read().decode())
+            print(f"   * FastAPI Backend LIVE on port 8000 (Engine: {data['quantum_engine']})")
+        except Exception:
+            print("   [!] Starting FastAPI server...")
+            subprocess.Popen([sys.executable, "backend/main.py"])
+            time.sleep(2)
+            print("   * FastAPI Server launched on port 8000.")
 
-    print("\n" + "=" * 70)
-    print("PRODUCTION SYSTEM HEALTHY & FULLY OPERATIONAL!")
-    print("   * API Base:   http://localhost:8000/api/v1")
-    print("   * WebSocket:  ws://localhost:8000/ws/ais/live")
-    print("   * Frontend:   http://localhost:8443")
-    print("=" * 70)
+        print("\n" + "=" * 70)
+        print("PRODUCTION SYSTEM HEALTHY & FULLY OPERATIONAL!")
+        print("   * API Base:   http://localhost:8000/api/v1")
+        print("   * WebSocket:  ws://localhost:8000/ws/ais/live")
+        print("   * Frontend:   http://localhost:8443")
+        print("=" * 70)
+    else:
+        print("\n[*] Initialization & dataset checks completed successfully.")
 
 
 if __name__ == "__main__":
