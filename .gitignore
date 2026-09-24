@@ -56,5 +56,7 @@ Thumbs.db
 .tmp-*
 
 # Presentation & Video Production Artifacts
-presentation_and_video/
-
+presentation_and_video/video_assets/
+presentation_and_video/Screen Recording*.mp4
+*.mp4.original.bak
+*.mp4.bak
